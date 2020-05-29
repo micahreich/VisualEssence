@@ -40,7 +40,8 @@ class DescriptorGenerator:
         return desc_corpus
 
     def tf_idf(self, train_corpus, n_terms=1):
-        tfidf_vectorizer = TfidfVectorizer(use_idf=True, stop_words=self.create_stop_words('model_data/stopwords.txt'))
+        tfidf_vectorizer = TfidfVectorizer(use_idf=True, stop_words=self.create_stop_words(
+            'description_data/stopwords.txt'))
         tfidf_vectorizer.fit_transform(train_corpus)
 
         tfidf_descriptors = []
@@ -66,6 +67,6 @@ class DescriptorGenerator:
 
 
 Descriptions = DescriptorGenerator()
-data = Descriptions.get_descriptions('model_data/450DESC.csv')
+data = Descriptions.get_descriptions('description_data/450DESC.csv')
 print(np.array(Descriptions.tf_idf(data))[0])
 

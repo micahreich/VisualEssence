@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d99f7d91-5553-4960-8a43-f95badaf2466" name="Default Changelist" comment="" />
+    <list default="true" id="d99f7d91-5553-4960-8a43-f95badaf2466" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/DescriptorGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureExtractor/DescriptorGen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_data/450DESC.csv" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureExtractor/description_data/450DESC.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_data/stopwords.txt" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureExtractor/description_data/stopwords.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,7 +22,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/EmbedRank" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1cVuCgwZmVMeRFBuT0tHRqXmGXh" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -36,6 +40,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/FeatureExtractor" />
       <recent name="$PROJECT_DIR$/CNN" />
       <recent name="$PROJECT_DIR$/CNN/cnn_data" />
       <recent name="$PROJECT_DIR$" />
@@ -97,7 +102,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DescriptorGen.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/FeatureExtractor/DescriptorGen.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -174,33 +179,33 @@
       <screen x="0" y="23" width="1440" height="825" />
     </state>
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.825@0.23.1440.825" timestamp="1590725702670" />
-    <state width="1379" height="204" key="GridCell.Tab.0.bottom" timestamp="1590734559415">
-      <screen x="0" y="23" width="1440" height="828" />
+    <state width="1379" height="204" key="GridCell.Tab.0.bottom" timestamp="1590784712073">
+      <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="237" key="GridCell.Tab.0.bottom/0.23.1440.824@0.23.1440.824" timestamp="1590635083781" />
     <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.825@0.23.1440.825" timestamp="1590724190068" />
-    <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.827@0.23.1440.827" timestamp="1590728018226" />
+    <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.827@0.23.1440.827" timestamp="1590784712073" />
     <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.828@0.23.1440.828" timestamp="1590734559415" />
-    <state width="1379" height="204" key="GridCell.Tab.0.center" timestamp="1590734559413">
-      <screen x="0" y="23" width="1440" height="828" />
+    <state width="1379" height="204" key="GridCell.Tab.0.center" timestamp="1590784712072">
+      <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="237" key="GridCell.Tab.0.center/0.23.1440.824@0.23.1440.824" timestamp="1590635083780" />
     <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
-    <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.827@0.23.1440.827" timestamp="1590728018226" />
+    <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.827@0.23.1440.827" timestamp="1590784712072" />
     <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.828@0.23.1440.828" timestamp="1590734559413" />
-    <state width="1379" height="204" key="GridCell.Tab.0.left" timestamp="1590734559412">
-      <screen x="0" y="23" width="1440" height="828" />
+    <state width="1379" height="204" key="GridCell.Tab.0.left" timestamp="1590784712072">
+      <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="237" key="GridCell.Tab.0.left/0.23.1440.824@0.23.1440.824" timestamp="1590635083779" />
     <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
-    <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.827@0.23.1440.827" timestamp="1590728018225" />
+    <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.827@0.23.1440.827" timestamp="1590784712072" />
     <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.828@0.23.1440.828" timestamp="1590734559412" />
-    <state width="1379" height="204" key="GridCell.Tab.0.right" timestamp="1590734559414">
-      <screen x="0" y="23" width="1440" height="828" />
+    <state width="1379" height="204" key="GridCell.Tab.0.right" timestamp="1590784712073">
+      <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="237" key="GridCell.Tab.0.right/0.23.1440.824@0.23.1440.824" timestamp="1590635083780" />
     <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
-    <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.827@0.23.1440.827" timestamp="1590728018226" />
+    <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.827@0.23.1440.827" timestamp="1590784712073" />
     <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.828@0.23.1440.828" timestamp="1590734559414" />
     <state x="227" y="56" key="SettingsEditor" timestamp="1590724083925">
       <screen x="0" y="23" width="1440" height="825" />

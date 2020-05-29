@@ -53,6 +53,6 @@ class DatasetGenerator:
         self.get_images(save_directory)
 
 
-DG = DatasetGenerator(5)
+DG = DatasetGenerator(3)
 DG.get_images("cnn_data")
 #DG.create_negative_samples("cnn_data/91505.png", "cnn_data/2406058.png", "cnn_data/2730865.png")
