@@ -17,10 +17,10 @@ class IconDiscriminator:
 
     def train_test_split(self):
         self.x_train = np.reshape(self.x_train, newshape=(len(self.x_train), 200, 200, 1))
-        self.x_test = np.reshape(self.x_train, newshape=(len(self.x_test), 200, 200, 1))
+        self.x_test = np.reshape(self.x_test, newshape=(len(self.x_test), 200, 200, 1))
 
-        self.y_train = tf.one_hot(self.y_train, 2)
-        self.y_test = tf.one_hot(self.y_test, 2)
+        """self.y_train = tf.one_hot(self.y_train, 2)
+        self.y_test = tf.one_hot(self.y_test, 2)"""
 
         train_ds = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).batch(64)
 
@@ -32,7 +32,7 @@ class IconDiscriminator:
         model = Sequential()
         # Convolution Block 1 (Conv2D, Conv2D, MaxPool2D)
         model.add(Conv2D(filters=64, kernel_size=(3, 3), activation="relu", padding="same",
-                         input_shape=(self.x_train.shape[1], self.x_train.shape[1], self.x_train.shape[2])))
+                         input_shape=(self.x_train.shape[1], self.x_train.shape[1], self.x_train.shape[3])))
         model.add(Conv2D(filters=64, kernel_size=(3, 3), activation="relu", padding="same"))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
@@ -93,8 +93,8 @@ class IconDiscriminator:
 
 if __name__ == "__main__":
     # Generate training, testing datasets
-    DatasetGen = CNN.CNNDataGen.DatasetGenerator(44)
-    data = DatasetGen.generate_dataset(False)
+    DatasetGen = CNN.CNNDataGen.DatasetGenerator(60000)
+    data = DatasetGen.generate_dataset(True)
 
     # Train CNN
     IconCNN = IconDiscriminator(data[0], data[1], data[2], data[3])
