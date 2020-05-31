@@ -9,6 +9,7 @@ from numpy import asarray
 import sklearn
 import tensorflow as tf
 import pickle
+import math
 import shutil
 
 
@@ -42,24 +43,37 @@ class DatasetGenerator:
 
             icon_id += 1
 
+    def distance(self, x1, y1, x2, y2):
+        return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+
     def create_negative_sample(self, path_to_img_1, path_to_img_2, path_to_img_3, icon_id):
 
         # Assuming 200 x 200 images rescaled to 140 x 140 to fit in different locations
         # within the new 200 x 200 random amalgamation
+
+        positions = []
+
         background = Image.open("blank_icon.png")
         _img_1 = Image.open(path_to_img_1).resize((100, 100), Image.ANTIALIAS)
         _img_2 = Image.open(path_to_img_2).resize((100, 100), Image.ANTIALIAS)
         _img_3 = Image.open(path_to_img_3).resize((100, 100), Image.ANTIALIAS)
 
         # Assuming 200 x 200 background
-        rand_placement_vector = sample(range(0, 100), 2)
-        background.paste(_img_1, (rand_placement_vector[0], rand_placement_vector[1]), _img_1)
+        rand_placement_vector_1 = sample(range(50, 150), 2)
+        background.paste(_img_1, (rand_placement_vector_1[0], rand_placement_vector_1[1]), _img_1)
+        positions.append([rand_placement_vector_1[0]-50, rand_placement_vector_1[1]-50])
 
-        rand_placement_vector = sample(range(0, 100), 2)
-        background.paste(_img_2, (rand_placement_vector[0], rand_placement_vector[1]), _img_2)
+        rand_placement_vector_2 = sample(range(50, 150), 2)
+        while self.distance(rand_placement_vector_2[0], rand_placement_vector_2[1],
+                            rand_placement_vector_1[0], rand_placement_vector_1[1]) < 20:
+            rand_placement_vector_2 = sample(range(50, 150), 2)
+        background.paste(_img_2, (rand_placement_vector_2[0]-50, rand_placement_vector_2[1]-50), _img_2)
 
-        rand_placement_vector = sample(range(0, 100), 2)
-        background.paste(_img_3, (rand_placement_vector[0], rand_placement_vector[1]), _img_3)
+        rand_placement_vector_3 = sample(range(50, 150), 2)
+        while self.distance(rand_placement_vector_2[0], rand_placement_vector_2[1],
+                            rand_placement_vector_3[0], rand_placement_vector_3[1]) < 20:
+            rand_placement_vector_3 = sample(range(50, 150), 2)
+        background.paste(_img_3, (rand_placement_vector_3[0]-50, rand_placement_vector_3[1]-50), _img_3)
 
         background.save("cnn_data/R_" + str(icon_id) + ".png", "PNG")
 
