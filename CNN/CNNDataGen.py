@@ -28,6 +28,9 @@ class DatasetGenerator:
         icon_id = 0
 
         for i in range(self.n_samples):
+            if (i+1) % 100 == 0:
+                print("Grabbed " + str(i+1) + " images")
+
             rand_icon_id = randint(0, 3368879)
 
             while rand_icon_id in img_ids:

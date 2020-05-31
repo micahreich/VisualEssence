@@ -67,6 +67,6 @@ class DescriptorGenerator:
 
 
 Descriptions = DescriptorGenerator()
-data = Descriptions.get_descriptions('description_data/450DESC.csv')
+data = Descriptions.get_descriptions("description_data/DESC450.csv")
 print(np.array(Descriptions.tf_idf(data))[0])
 
