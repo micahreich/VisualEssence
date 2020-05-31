@@ -6,8 +6,10 @@ from random import choice
 import os
 import numpy as np
 from numpy import asarray
-from numpy import ndarray
+import sklearn
+import tensorflow as tf
 import pickle
+import shutil
 
 
 class DatasetGenerator:
@@ -15,7 +17,7 @@ class DatasetGenerator:
         try:
             os.mkdir("cnn_data")
         except FileExistsError:
-            print("cnn_data already exists")
+            print("WARNING: directory cnn_data already exists")
 
         self.n_samples = n_samples
 
@@ -61,7 +63,7 @@ class DatasetGenerator:
 
         background.save("cnn_data/R_" + str(icon_id) + ".png", "PNG")
 
-    def generate_dataset(self, save_directory):
+    def create_samples(self, save_directory):
 
         files = os.listdir(save_directory)
         for i in range(len(files)):
@@ -104,7 +106,6 @@ class DatasetGenerator:
             current_image = "cnn_data/{}".format(i)
             _img = Image.open(current_image).convert('L')
             _img_arr = asarray(_img)
-            print("IMG PICK:" + str(_img_arr.shape) + i)
 
             images.append(_img_arr)
 
@@ -116,7 +117,7 @@ class DatasetGenerator:
         pickle.dump(images, pickled_images)
         pickle.dump(labels, pickled_labels)
 
-        #os.rmdir("cnn_data")
+        shutil.rmtree("cnn_data")
 
     def load_pickled_dataset(self):
         pickled_images = open('pkl_images.pkl', 'rb')
@@ -125,10 +126,39 @@ class DatasetGenerator:
         images = pickle.load(pickled_images)
         labels = pickle.load(pickled_labels)
 
+        _images = asarray(images)
+        _labels = asarray(labels)
 
-if __name__ == "__main__":
-    DG = DatasetGenerator(4)
-    """DG.get_images("cnn_data")
-    DG.generate_dataset("cnn_data")
-    DG.pickle_dataset()
-    DG.load_pickled_dataset()"""
+        return _images, _labels
+
+    def generate_dataset(self, dataset_exists):
+        if not dataset_exists:
+            self.get_images("cnn_data")
+            self.create_samples("cnn_data")
+            self.pickle_dataset()
+            data = self.load_pickled_dataset()
+        else:
+            data = self.load_pickled_dataset()
+
+        # 60k n_samples: 15k of each class, 30k total
+
+        split_point = int(0.8*(self.n_samples/2))
+
+        images, labels = sklearn.utils.shuffle(data[0], data[1])
+
+        images_train = images[0:split_point]
+        labels_train = labels[0:split_point]
+
+        images_test = images[split_point:]
+        labels_test = labels[split_point:]
+
+        print("Train images, labels: ", len(images_train),
+              "\n Image array shape: ", images_train.shape,
+              "\n Label array shape: ", labels_train.shape)
+
+        print("Test images, labels: ", len(images_test),
+              "\n Image array shape: ", images_test.shape,
+              "\n Label array shape: ", labels_test.shape)
+
+        return images_train, labels_train, images_test, labels_test
+
