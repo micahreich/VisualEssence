@@ -2,11 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d99f7d91-5553-4960-8a43-f95badaf2466" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/IconGenerator/blank_icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IconGenerator/test_icons/console.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IconGenerator/test_icons/food.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IconGenerator/test_icons/heart.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CNN/CNNDataGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/CNNDataGen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CNN/IconDiscriminator.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/IconDiscriminator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureExtractor/DescriptorGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureExtractor/DescriptorGen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureExtractor/description_data/450DESC.csv" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureExtractor/description_data/DESC450.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/env/bin/python" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/env/bin/python3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/env/lib64" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/env/pyvenv.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IconGenerator/IconGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/IconGenerator/IconGen.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,21 +42,24 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/IconGenerator" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/IconGenerator" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/IconGenerator/test_icons" />
       <recent name="$PROJECT_DIR$/FeatureExtractor/description_data" />
       <recent name="$PROJECT_DIR$/FeatureExtractor" />
       <recent name="$PROJECT_DIR$/IconGenerator" />
       <recent name="$PROJECT_DIR$/CNN" />
-      <recent name="$PROJECT_DIR$/CNN/cnn_data" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.IconDiscriminator">
+  <component name="RunManager" selected="Python.IconGen">
     <configuration name="CNNDataGen (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="VisualEssence" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -208,10 +218,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.IconGen" />
         <item itemvalue="Python.IconDiscriminator" />
         <item itemvalue="Python.CNNDataGen" />
         <item itemvalue="Python.new_test" />
-        <item itemvalue="Python.IconGen" />
         <item itemvalue="Python.CNNDataGen (1)" />
       </list>
     </recent_temporary>
@@ -255,33 +265,33 @@
     </state>
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.824@0.23.1440.824" timestamp="1590900931047" />
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.825@0.23.1440.825" timestamp="1590725702670" />
-    <state width="1379" height="204" key="GridCell.Tab.0.bottom" timestamp="1590963535296">
+    <state width="1379" height="135" key="GridCell.Tab.0.bottom" timestamp="1590978245228">
       <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.824@0.23.1440.824" timestamp="1590900821700" />
     <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.825@0.23.1440.825" timestamp="1590724190068" />
-    <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.827@0.23.1440.827" timestamp="1590963535296" />
+    <state width="1379" height="135" key="GridCell.Tab.0.bottom/0.23.1440.827@0.23.1440.827" timestamp="1590978245228" />
     <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.828@0.23.1440.828" timestamp="1590912054055" />
-    <state width="1379" height="204" key="GridCell.Tab.0.center" timestamp="1590963535296">
+    <state width="1379" height="135" key="GridCell.Tab.0.center" timestamp="1590978245227">
       <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.824@0.23.1440.824" timestamp="1590900821698" />
     <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
-    <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.827@0.23.1440.827" timestamp="1590963535296" />
+    <state width="1379" height="135" key="GridCell.Tab.0.center/0.23.1440.827@0.23.1440.827" timestamp="1590978245227" />
     <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.828@0.23.1440.828" timestamp="1590912054054" />
-    <state width="1379" height="204" key="GridCell.Tab.0.left" timestamp="1590963535295">
+    <state width="1379" height="135" key="GridCell.Tab.0.left" timestamp="1590978245226">
       <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.824@0.23.1440.824" timestamp="1590900821697" />
     <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
-    <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.827@0.23.1440.827" timestamp="1590963535295" />
+    <state width="1379" height="135" key="GridCell.Tab.0.left/0.23.1440.827@0.23.1440.827" timestamp="1590978245226" />
     <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.828@0.23.1440.828" timestamp="1590912054054" />
-    <state width="1379" height="204" key="GridCell.Tab.0.right" timestamp="1590963535296">
+    <state width="1379" height="135" key="GridCell.Tab.0.right" timestamp="1590978245227">
       <screen x="0" y="23" width="1440" height="827" />
     </state>
     <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.824@0.23.1440.824" timestamp="1590900821700" />
     <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
-    <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.827@0.23.1440.827" timestamp="1590963535296" />
+    <state width="1379" height="135" key="GridCell.Tab.0.right/0.23.1440.827@0.23.1440.827" timestamp="1590978245227" />
     <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.828@0.23.1440.828" timestamp="1590912054054" />
     <state x="227" y="56" key="SettingsEditor" timestamp="1590910708388">
       <screen x="0" y="23" width="1440" height="827" />

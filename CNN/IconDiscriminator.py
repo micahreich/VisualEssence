@@ -94,7 +94,7 @@ class IconDiscriminator:
 if __name__ == "__main__":
     # Generate training, testing datasets
     DatasetGen = CNNDataGen.DatasetGenerator(60000)
-    data = DatasetGen.generate_dataset(True)
+    data = DatasetGen.generate_dataset(False)
 
     # Train CNN
     IconCNN = IconDiscriminator(data[0], data[1], data[2], data[3])

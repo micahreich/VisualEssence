@@ -23,6 +23,7 @@ class DatasetGenerator:
         self.n_samples = n_samples
 
     def get_images(self, save_directory):
+        print("\n STARTING ICON COLLECTION")
 
         img_ids = []
         icon_id = 0
@@ -40,7 +41,7 @@ class DatasetGenerator:
 
             img_url = "https://static.thenounproject.com/png/{}-200.png".format(rand_icon_id)
 
-            with open(save_directory + "/I_" + str(icon_id) + ".png", 'wb') as f:
+            with open(os.path.abspath(save_directory + "/I_" + str(icon_id) + ".png"), 'wb') as f:
                 f.write(requests.get(img_url).content)
             f.close()
 
@@ -81,6 +82,7 @@ class DatasetGenerator:
         background.save("cnn_data/R_" + str(icon_id) + ".png", "PNG")
 
     def create_samples(self, save_directory):
+        print("\n STARTING NEGATIVE SAMPLE CREATION")
 
         files = os.listdir(os.path.abspath(save_directory))
         for i in range(len(files)):
@@ -91,6 +93,8 @@ class DatasetGenerator:
         icon_id = 0
 
         for i in range(int(self.n_samples/4)):
+            if (i+1) % 100 == 0:
+                print("Generated " + str(i+1) + " negative samples")
 
             img_1 = choice(files)
             files.remove(img_1)
@@ -111,20 +115,18 @@ class DatasetGenerator:
             os.remove(os.path.abspath(save_directory + "/" + img_2))
             os.remove(os.path.abspath(save_directory + "/" + img_3))
 
-            if (i+1) % 100 == 0:
-                print("Generated " + str(i+1) + " negative samples")
-
     def pickle_dataset(self):
+        print("\n PICKLING DATASET")
 
-        pickled_images = open('pkl_images.pkl', 'wb')
-        pickled_labels = open('pkl_labels.pkl', 'wb')
+        pickled_images = open(os.path.abspath('pkl_images.pkl'), 'wb')
+        pickled_labels = open(os.path.abspath('pkl_images.pkl'), 'wb')
 
         images = []
         labels = []
 
-        for i in os.listdir("cnn_data"):
+        for i in os.listdir(os.path.abspath("cnn_data")):
             current_image = "cnn_data/{}".format(i)
-            _img = Image.open(current_image).convert('L')
+            _img = Image.open(os.path.abspath(current_image)).convert('L')
             _img_arr = asarray(_img)
 
             images.append(_img_arr)
@@ -137,11 +139,13 @@ class DatasetGenerator:
         pickle.dump(images, pickled_images)
         pickle.dump(labels, pickled_labels)
 
-        shutil.rmtree("cnn_data")
+        #shutil.rmtree("cnn_data")
 
     def load_pickled_dataset(self):
-        pickled_images = open('pkl_images.pkl', 'rb')
-        pickled_labels = open('pkl_labels.pkl', 'rb')
+        print("\n LOADING PICKLED DATASET")
+
+        pickled_images = open(os.path.abspath('pkl_images.pkl'), 'rb')
+        pickled_labels = open(os.path.abspath('pkl_labels.pkl'), 'rb')
 
         images = pickle.load(pickled_images)
         labels = pickle.load(pickled_labels)
@@ -154,9 +158,7 @@ class DatasetGenerator:
     def generate_dataset(self, dataset_exists):
         if not dataset_exists:
             self.get_images("cnn_data")
-            self.create_samples("cnn_data")
-            self.pickle_dataset()
-            data = self.load_pickled_dataset()
+            print("\nICON COLLECTION COMPLETED SUCCESSFULLY")
         else:
             self.create_samples("cnn_data")
             self.pickle_dataset()
@@ -183,4 +185,3 @@ class DatasetGenerator:
               "\n Label array shape: ", labels_test.shape)
 
         return images_train, labels_train, images_test, labels_test
-
