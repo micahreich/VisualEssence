@@ -56,7 +56,7 @@ class DatasetGenerator:
 
         positions = []
 
-        background = Image.open("blank_icon.png")
+        background = Image.open(os.path.abspath("blank_icon.png"))
         _img_1 = Image.open(path_to_img_1).resize((100, 100), Image.ANTIALIAS)
         _img_2 = Image.open(path_to_img_2).resize((100, 100), Image.ANTIALIAS)
         _img_3 = Image.open(path_to_img_3).resize((100, 100), Image.ANTIALIAS)
@@ -82,7 +82,7 @@ class DatasetGenerator:
 
     def create_samples(self, save_directory):
 
-        files = os.listdir(save_directory)
+        files = os.listdir(os.path.abspath(save_directory))
         for i in range(len(files)):
             if files[i] == ".DS_Store":
                 files.pop(i)
@@ -101,15 +101,18 @@ class DatasetGenerator:
             img_3 = choice(files)
             files.remove(img_3)
 
-            self.create_negative_sample(save_directory + "/" + img_1,
-                                        save_directory + "/" + img_2,
-                                        save_directory + "/" + img_3,
+            self.create_negative_sample(os.path.abspath(save_directory + "/" + img_1),
+                                        os.path.abspath(save_directory + "/" + img_2),
+                                        os.path.abspath(save_directory + "/" + img_3),
                                         icon_id)
             icon_id += 1
 
-            os.remove(save_directory + "/" + img_1)
-            os.remove(save_directory + "/" + img_2)
-            os.remove(save_directory + "/" + img_3)
+            os.remove(os.path.abspath(save_directory + "/" + img_1))
+            os.remove(os.path.abspath(save_directory + "/" + img_2))
+            os.remove(os.path.abspath(save_directory + "/" + img_3))
+
+            if (i+1) % 100 == 0:
+                print("Generated " + str(i+1) + " negative samples")
 
     def pickle_dataset(self):
 
@@ -155,6 +158,8 @@ class DatasetGenerator:
             self.pickle_dataset()
             data = self.load_pickled_dataset()
         else:
+            self.create_samples("cnn_data")
+            self.pickle_dataset()
             data = self.load_pickled_dataset()
 
         # 60k n_samples: 15k of each class, 30k total

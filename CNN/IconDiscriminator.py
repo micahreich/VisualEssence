@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import Adam
-import CNN.CNNDataGen
+import CNNDataGen
 
 import numpy as np
 
@@ -93,8 +93,8 @@ class IconDiscriminator:
 
 if __name__ == "__main__":
     # Generate training, testing datasets
-    DatasetGen = CNN.CNNDataGen.DatasetGenerator(60000)
-    data = DatasetGen.generate_dataset(False)
+    DatasetGen = CNNDataGen.DatasetGenerator(60000)
+    data = DatasetGen.generate_dataset(True)
 
     # Train CNN
     IconCNN = IconDiscriminator(data[0], data[1], data[2], data[3])
