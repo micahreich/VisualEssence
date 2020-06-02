@@ -17,11 +17,11 @@ def convex_hull(icon_1_path, icon_2_path, icon_3_path, position_vector):
 
     icon_1 = invert(io.imread('test_icons/console.png', as_gray=True))  # original icon image
     icon_1_chull = asarray(invert(convex_hull_image(icon_1)))  # convex hull icon image
-    icon_1_chull_array = asarray(Image.fromarray(icon_1_chull).resize((120, 120)))  # convex hull image as array
+    icon_1_chull_array = asarray(Image.fromarray(icon_1_chull).resize((140, 140)))  # convex hull image as array
 
-    _icon_1 = Image.open('test_icons/console.png').resize((120, 120), Image.ANTIALIAS)
-    background_1.paste(Image.fromarray(icon_1_chull_array), (icon_1_coords[0]-60, icon_1_coords[1]-60))
-    background_1_icon.paste(_icon_1, (icon_1_coords[0] - 60, icon_1_coords[1] - 60), _icon_1)
+    _icon_1 = Image.open('test_icons/console.png').resize((140, 140), Image.ANTIALIAS)
+    background_1.paste(Image.fromarray(icon_1_chull_array), (icon_1_coords[0]-70, icon_1_coords[1]-70))
+    background_1_icon.paste(_icon_1, (icon_1_coords[0] - 70, icon_1_coords[1] - 70), _icon_1)
 
     background_1_array = asarray(background_1)  # background w/ pasted chull image as array
     background_1_icon_array = asarray(background_1_icon)
@@ -65,6 +65,6 @@ def convex_hull(icon_1_path, icon_2_path, icon_3_path, position_vector):
 
 
 convex_hull('test_icons/console.png', 'test_icons/food.png', 'test_icons/heart.png',
-            [[50, 125],
-             [100, 100],
+            [[100, 100],
+             [50, 75],
              [150, 125]])

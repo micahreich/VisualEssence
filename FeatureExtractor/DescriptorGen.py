@@ -2,6 +2,7 @@ import csv
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
+import os
 
 
 class DescriptorGenerator:
@@ -67,6 +68,6 @@ class DescriptorGenerator:
 
 
 Descriptions = DescriptorGenerator()
-data = Descriptions.get_descriptions("description_data/DESC450.csv")
+data = Descriptions.get_descriptions(os.path.abspath("description_data/DESC450.csv"))
 print(np.array(Descriptions.tf_idf(data))[0])
 
