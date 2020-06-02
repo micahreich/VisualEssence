@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from skimage import measure
 from numpy import asarray
 from sklearn.cluster import KMeans
+from sklearn.cluster import AffinityPropagation
 
 
 def consecutive_pixels(array):
@@ -32,27 +33,30 @@ def consecutive_pixels(array):
         black_rows.append(r_i_max)
         r_i_max = 0
 
-    print("ROW MEDIAN ", statistics.median(black_rows))
     return statistics.median(black_rows)
 
 
-def cluster_images(path_to_images, n_samples=100):
+def cluster_images(path_to_images):
     _img_arr = []
     pixel_data = []
 
-    for i in os.listdir(os.path.abspath(path_to_images)):
-        img = io.imread(os.path.abspath(path_to_images + "/" + i), as_gray=True)
-        _img_arr.append(asarray(img))
+    filenames = os.listdir(path_to_images)
 
-    print(os.listdir(os.path.abspath(path_to_images)))
+    for i in range(len(filenames)):
+        img = io.imread(os.path.abspath(path_to_images + "/" + filenames[i]), as_gray=True)
+        _img_arr.append(asarray(img))
 
     for i in _img_arr:
         pixel_data.append(
             [consecutive_pixels(i)]
         )
 
-    kmeans = KMeans(n_clusters=2, random_state=0).fit(pixel_data)
-    print(kmeans.labels_)
+    kmeans = KMeans(n_clusters=3, random_state=0).fit(pixel_data)
+
+    cluster = []
+    for i in range(len(filenames)):
+        cluster.append([filenames[i], kmeans.labels_[i]])
+    print(cluster)
 
 
-cluster_images('test_icons')
+cluster_images("/Users/micahreich/Documents/VisualEssence/CNN/cnn_data")

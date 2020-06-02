@@ -15,9 +15,9 @@ import shutil
 
 
 class DatasetGenerator:
-    def __init__(self, n_samples):
+    def __init__(self, n_samples, save_directory):
         try:
-            os.mkdir("cnn_data")
+            os.mkdir(save_directory)
         except FileExistsError:
             print("WARNING: directory cnn_data already exists")
 
@@ -30,8 +30,8 @@ class DatasetGenerator:
         icon_id = 0
 
         for i in range(self.n_samples):
-            if (i+1) % 100 == 0:
-                print("Grabbed " + str(i+1) + " images")
+            if (i + 1) % 100 == 0:
+                print("Grabbed " + str(i + 1) + " images")
 
             rand_icon_id = randint(0, 3368879)
 
@@ -49,7 +49,7 @@ class DatasetGenerator:
             icon_id += 1
 
     def distance(self, x1, y1, x2, y2):
-        return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
     def create_negative_sample(self, path_to_img_1, path_to_img_2, path_to_img_3, icon_id):
 
@@ -68,19 +68,19 @@ class DatasetGenerator:
             # Assuming 200 x 200 background
             rand_placement_vector_1 = sample(range(50, 150), 2)
             background.paste(_img_1, (rand_placement_vector_1[0], rand_placement_vector_1[1]), _img_1)
-            positions.append([rand_placement_vector_1[0]-50, rand_placement_vector_1[1]-50])
+            positions.append([rand_placement_vector_1[0] - 50, rand_placement_vector_1[1] - 50])
 
             rand_placement_vector_2 = sample(range(50, 150), 2)
             while self.distance(rand_placement_vector_2[0], rand_placement_vector_2[1],
                                 rand_placement_vector_1[0], rand_placement_vector_1[1]) < 20:
                 rand_placement_vector_2 = sample(range(50, 150), 2)
-            background.paste(_img_2, (rand_placement_vector_2[0]-50, rand_placement_vector_2[1]-50), _img_2)
+            background.paste(_img_2, (rand_placement_vector_2[0] - 50, rand_placement_vector_2[1] - 50), _img_2)
 
             rand_placement_vector_3 = sample(range(50, 150), 2)
             while self.distance(rand_placement_vector_2[0], rand_placement_vector_2[1],
                                 rand_placement_vector_3[0], rand_placement_vector_3[1]) < 20:
                 rand_placement_vector_3 = sample(range(50, 150), 2)
-            background.paste(_img_3, (rand_placement_vector_3[0]-50, rand_placement_vector_3[1]-50), _img_3)
+            background.paste(_img_3, (rand_placement_vector_3[0] - 50, rand_placement_vector_3[1] - 50), _img_3)
             background.save("cnn_data/R_" + str(icon_id) + ".png", "PNG")
         except PIL.UnidentifiedImageError as e:
             print("IMAGE ERROR, COULD NOT FIND: ", e)
@@ -106,9 +106,9 @@ class DatasetGenerator:
         icon_id = 0
         print(good_fcount)
 
-        for i in range(int(good_fcount/4)):
-            if (i+1) % 100 == 0:
-                print("Generated " + str(i+1) + " negative samples")
+        for i in range(int(good_fcount / 4)):
+            if (i + 1) % 100 == 0:
+                print("Generated " + str(i + 1) + " negative samples")
 
             img_1 = choice(files)
             while not os.path.exists(os.path.abspath(save_directory + "/" + img_1)):
@@ -150,7 +150,6 @@ class DatasetGenerator:
                 r_cnt += 1
         print("POS IMGS ", i_cnt)
         print("NEG IMGS ", r_cnt)
-      
 
         pickled_images = open(os.path.abspath('pkl_images.pkl'), 'wb')
         pickled_labels = open(os.path.abspath('pkl_labels.pkl'), 'wb')
@@ -172,13 +171,13 @@ class DatasetGenerator:
                     labels.append(0)
             except PIL.UnidentifiedImageError:
                 print("COULD NOT FIND IMAGE, CONTINUING...")
-                
+
         pickle.dump(images, pickled_images)
         pickle.dump(labels, pickled_labels)
         print(len(images))
         print(asarray(images).shape)
 
-        #shutil.rmtree("cnn_data")
+        # shutil.rmtree("cnn_data")
 
     def load_pickled_dataset(self):
         print("\n LOADING PICKLED DATASET")
@@ -203,16 +202,16 @@ class DatasetGenerator:
             self.pickle_dataset()
             print("CREATED PICKLED DATASET SUCCESSFULLY")
         else:
-            #self.create_samples("cnn_data")
-            #print("\nNEGATIVE SAMPLE CREATION COMPLETED SUCCESSFULLY")
-            #self.pickle_dataset()
-            #print("PICKLED DATASET COMPLETED SUCCESSFULLY")
+            # self.create_samples("cnn_data")
+            # print("\nNEGATIVE SAMPLE CREATION COMPLETED SUCCESSFULLY")
+            # self.pickle_dataset()
+            # print("PICKLED DATASET COMPLETED SUCCESSFULLY")
             data = self.load_pickled_dataset()
 
         # 60k n_samples: 15k of each class, 30k total
         print("GENERATING DATA SPLIT")
 
-        split_point = int(0.8*(self.n_samples/2))
+        split_point = int(0.8 * (self.n_samples / 2))
 
         images, labels = sklearn.utils.shuffle(data[0], data[1])
 
