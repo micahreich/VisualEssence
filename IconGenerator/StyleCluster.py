@@ -74,9 +74,28 @@ class StyleCluster():
     def display_data(self, labels, class_no):
         for i in range(len(labels)):
             if labels[i] == class_no:
-                print(self.fnames[i].replace(".png", "") + ":" + str(labels[i]))
+                print(self.fnames[i][self.fnames[i].index("_")+1:self.fnames[i].index(".")] + ": " + str(labels[i]))
 
-    def cluster_images(self, n_samples=12):
+    def save_model(self, model):
+        pickled_model = open(os.path.abspath('kmeans_model.pkl'), 'wb')
+        pickle.dump(model, pickled_model)
+
+    def load_model(self):
+        pickled_model = open(os.path.abspath('kmeans_model.pkl'), 'rb')
+        return pickle.load(pickled_model)
+
+    def predict(self, path_to_image):
+        print("PREDICTING " + path_to_image)
+        img = Image.open(os.path.abspath(path_to_image))
+        pixel_data = self.consecutive_pixels(
+            ((255 - np.asarray(img))[:, :, 3])
+        )
+
+        kmeans = self.load_model()
+        print(kmeans.predict([[pixel_data]])[0])
+        return kmeans.predict([[pixel_data]])[0]
+
+    def cluster_images(self, n_samples=1200):
         if self.run_mode == RunMode.DOWNLOAD_PICKLE_CLUSTER:
             try:
                 shutil.rmtree(self.path_to_images)
@@ -105,12 +124,15 @@ class StyleCluster():
                 [self.consecutive_pixels(i)]
             )
 
-        kmeans = KMeans(n_clusters=3, random_state=0).fit(pixel_data)
+        kmeans = KMeans(n_clusters=3, random_state=0, max_iter=400).fit(pixel_data)
+        self.save_model(kmeans)
 
         return kmeans
 
 
 if __name__ == "__main__":
-    cluster = StyleCluster("/Users/micahreich/Documents/VisualEssence/style_data", RunMode.CLUSTER)
+    cluster = StyleCluster("/nethome/mreich8/VisualEssence/data/style_data", RunMode.DOWNLOAD_PICKLE_CLUSTER)
     model = cluster.cluster_images()
-    cluster.display_data(model.labels_, 1)
+    cluster.display_data(model.labels_, 2)
+    #cluster.predict("/Users/micahreich/Documents/VisualEssence/style_data/I_145128.png")
+    #cluster.predict("/nethome/mreich8/VisualEssence/data/Clustering/style_data/)
