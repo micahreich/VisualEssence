@@ -8,15 +8,15 @@ from numpy import asarray
 from PIL import Image
 from sklearn.cluster import KMeans
 import shutil
-from enum import Enum, auto
+from enum import Enum
 import sys
 import IconDataGen
 
 
 class RunMode(Enum):
-    DOWNLOAD_PICKLE_CLUSTER = auto()
-    PICKLE_CLUSTER = auto()
-    CLUSTER = auto()
+    DOWNLOAD_PICKLE_CLUSTER = 1
+    PICKLE_CLUSTER = 2
+    CLUSTER = 3
 
 
 class StyleCluster():
@@ -59,8 +59,10 @@ class StyleCluster():
             if counter % 20 == 0:
                 print("GRABBED " + str(counter) + " IMAGES")
             try:
-                img = io.imread(os.path.abspath(self.path_to_images + "/" + i), as_gray=True)
-                _img_arr.append(asarray(img * 255))
+                img = Image.open(os.path.abspath(self.path_to_images + "/" + i))
+                _img_arr.append(
+                    ((255 - np.asarray(img))[:, :, 3])
+                )
             except ValueError:
                 print("VALUE ERROR, CONTINUING...")
                 self.fnames.remove(i)
@@ -111,4 +113,4 @@ class StyleCluster():
 if __name__ == "__main__":
     cluster = StyleCluster("/Users/micahreich/Documents/VisualEssence/style_data", RunMode.CLUSTER)
     model = cluster.cluster_images()
-    cluster.display_data(model.labels_, 0)
+    cluster.display_data(model.labels_, 1)
