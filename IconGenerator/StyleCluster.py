@@ -7,6 +7,7 @@ import pickle
 from numpy import asarray
 from PIL import Image
 from sklearn.cluster import KMeans
+import shutil
 from enum import Enum, auto
 import sys
 import IconDataGen
@@ -41,7 +42,8 @@ class StyleCluster():
                     if len(img[0]) - j < r_i_max:
                         break
 
-            black_rows.append(r_i_max)
+            if r_i_max > 0:
+                black_rows.append(r_i_max)
             r_i_max = 0
         return statistics.median(black_rows)
 
@@ -72,8 +74,13 @@ class StyleCluster():
             if labels[i] == class_no:
                 print(self.fnames[i].replace(".png", "") + ":" + str(labels[i]))
 
-    def cluster_images(self, n_samples=10):
+    def cluster_images(self, n_samples=12):
         if self.run_mode == RunMode.DOWNLOAD_PICKLE_CLUSTER:
+            try:
+                shutil.rmtree(self.path_to_images)
+            except FileNotFoundError:
+                print("FNF")
+
             DataGen = IconDataGen.DatasetGenerator(n_samples, self.path_to_images)
             DataGen.get_images(self.path_to_images)
             self.fnames = os.listdir(os.path.abspath(self.path_to_images))
