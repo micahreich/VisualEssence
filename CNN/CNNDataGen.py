@@ -42,7 +42,7 @@ class DatasetGenerator:
 
             img_url = "https://static.thenounproject.com/png/{}-200.png".format(rand_icon_id)
 
-            with open(os.path.abspath(save_directory + "/I_" + str(icon_id) + ".png"), 'wb') as f:
+            with open(os.path.abspath(save_directory + "/I_" + str(rand_icon_id) + ".png"), 'wb') as f:
                 f.write(requests.get(img_url).content)
             f.close()
 

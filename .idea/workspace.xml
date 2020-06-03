@@ -2,15 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d99f7d91-5553-4960-8a43-f95badaf2466" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/DataGen.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IconGenerator/GAN.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IconGenerator/IconDataGen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNN/src/CNNDataGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/CNNDataGen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNN/src/IconDiscriminator.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/IconDiscriminator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/CNNDataGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/CNNDataGen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/IconDiscriminator.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/IconDiscriminator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IconGenerator/StyleCluster.py" beforeDir="false" afterPath="$PROJECT_DIR$/IconGenerator/StyleCluster.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/test_icons/1-200.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/test_icons/12-200.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/test_icons/3368879-200.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/test_icons/9876-200.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +53,7 @@
       <recent name="$PROJECT_DIR$/IconGenerator" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.StyleCluster">
+  <component name="RunManager" selected="Python.GAN">
     <configuration name="CNNDataGen" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="VisualEssence" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,6 +96,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="GAN" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="VisualEssence" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IconGenerator" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IconGenerator/GAN.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="IconDiscriminator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="VisualEssence" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -112,27 +130,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CNN/IconDiscriminator.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="IconGen_v1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="VisualEssence" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/IconGenerator" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/IconGenerator/IconGen_v1.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -209,17 +206,17 @@
       <item itemvalue="Python.DescriptorGen" />
       <item itemvalue="Python.CNNDataGen" />
       <item itemvalue="Python.IconDiscriminator" />
-      <item itemvalue="Python.IconGen_v1" />
       <item itemvalue="Python.POSTest" />
       <item itemvalue="Python.StyleCluster" />
+      <item itemvalue="Python.GAN" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.GAN" />
         <item itemvalue="Python.StyleCluster" />
         <item itemvalue="Python.IconDiscriminator" />
         <item itemvalue="Python.CNNDataGen" />
         <item itemvalue="Python.POSTest" />
-        <item itemvalue="Python.IconGen_v1" />
       </list>
     </recent_temporary>
   </component>
@@ -262,41 +259,42 @@
     </state>
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.824@0.23.1440.824" timestamp="1591082158291" />
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.825@0.23.1440.825" timestamp="1590725702670" />
-    <state width="1379" height="143" key="GridCell.Tab.0.bottom" timestamp="1591082758787">
+    <state width="1379" height="143" key="GridCell.Tab.0.bottom" timestamp="1591153365761">
       <screen x="0" y="23" width="1440" height="824" />
     </state>
-    <state width="1379" height="135" key="GridCell.Tab.0.bottom/0.23.1440.823@0.23.1440.823" timestamp="1590985903949" />
-    <state width="1379" height="143" key="GridCell.Tab.0.bottom/0.23.1440.824@0.23.1440.824" timestamp="1591082758787" />
+    <state width="1379" height="143" key="GridCell.Tab.0.bottom/0.23.1440.823@0.23.1440.823" timestamp="1591152883895" />
+    <state width="1379" height="143" key="GridCell.Tab.0.bottom/0.23.1440.824@0.23.1440.824" timestamp="1591153365761" />
     <state width="1379" height="204" key="GridCell.Tab.0.bottom/0.23.1440.825@0.23.1440.825" timestamp="1590724190068" />
     <state width="1379" height="135" key="GridCell.Tab.0.bottom/0.23.1440.827@0.23.1440.827" timestamp="1590982438460" />
     <state width="1379" height="135" key="GridCell.Tab.0.bottom/0.23.1440.828@0.23.1440.828" timestamp="1590985540879" />
-    <state width="1379" height="143" key="GridCell.Tab.0.center" timestamp="1591082758786">
+    <state width="1379" height="143" key="GridCell.Tab.0.center" timestamp="1591153365761">
       <screen x="0" y="23" width="1440" height="824" />
     </state>
-    <state width="1379" height="135" key="GridCell.Tab.0.center/0.23.1440.823@0.23.1440.823" timestamp="1590985903948" />
-    <state width="1379" height="143" key="GridCell.Tab.0.center/0.23.1440.824@0.23.1440.824" timestamp="1591082758786" />
+    <state width="1379" height="143" key="GridCell.Tab.0.center/0.23.1440.823@0.23.1440.823" timestamp="1591152883895" />
+    <state width="1379" height="143" key="GridCell.Tab.0.center/0.23.1440.824@0.23.1440.824" timestamp="1591153365761" />
     <state width="1379" height="204" key="GridCell.Tab.0.center/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
     <state width="1379" height="135" key="GridCell.Tab.0.center/0.23.1440.827@0.23.1440.827" timestamp="1590982438459" />
     <state width="1379" height="135" key="GridCell.Tab.0.center/0.23.1440.828@0.23.1440.828" timestamp="1590985540878" />
-    <state width="1379" height="143" key="GridCell.Tab.0.left" timestamp="1591082758786">
+    <state width="1379" height="143" key="GridCell.Tab.0.left" timestamp="1591153365760">
       <screen x="0" y="23" width="1440" height="824" />
     </state>
-    <state width="1379" height="135" key="GridCell.Tab.0.left/0.23.1440.823@0.23.1440.823" timestamp="1590985903948" />
-    <state width="1379" height="143" key="GridCell.Tab.0.left/0.23.1440.824@0.23.1440.824" timestamp="1591082758786" />
+    <state width="1379" height="143" key="GridCell.Tab.0.left/0.23.1440.823@0.23.1440.823" timestamp="1591152883894" />
+    <state width="1379" height="143" key="GridCell.Tab.0.left/0.23.1440.824@0.23.1440.824" timestamp="1591153365760" />
     <state width="1379" height="204" key="GridCell.Tab.0.left/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
     <state width="1379" height="135" key="GridCell.Tab.0.left/0.23.1440.827@0.23.1440.827" timestamp="1590982438458" />
     <state width="1379" height="135" key="GridCell.Tab.0.left/0.23.1440.828@0.23.1440.828" timestamp="1590985540877" />
-    <state width="1379" height="143" key="GridCell.Tab.0.right" timestamp="1591082758787">
+    <state width="1379" height="143" key="GridCell.Tab.0.right" timestamp="1591153365761">
       <screen x="0" y="23" width="1440" height="824" />
     </state>
-    <state width="1379" height="135" key="GridCell.Tab.0.right/0.23.1440.823@0.23.1440.823" timestamp="1590985903948" />
-    <state width="1379" height="143" key="GridCell.Tab.0.right/0.23.1440.824@0.23.1440.824" timestamp="1591082758787" />
+    <state width="1379" height="143" key="GridCell.Tab.0.right/0.23.1440.823@0.23.1440.823" timestamp="1591152883895" />
+    <state width="1379" height="143" key="GridCell.Tab.0.right/0.23.1440.824@0.23.1440.824" timestamp="1591153365761" />
     <state width="1379" height="204" key="GridCell.Tab.0.right/0.23.1440.825@0.23.1440.825" timestamp="1590724190067" />
     <state width="1379" height="135" key="GridCell.Tab.0.right/0.23.1440.827@0.23.1440.827" timestamp="1590982438459" />
     <state width="1379" height="135" key="GridCell.Tab.0.right/0.23.1440.828@0.23.1440.828" timestamp="1590985540878" />
-    <state x="227" y="56" key="SettingsEditor" timestamp="1590910708388">
-      <screen x="0" y="23" width="1440" height="827" />
+    <state x="227" y="56" key="SettingsEditor" timestamp="1591151752105">
+      <screen x="0" y="23" width="1440" height="823" />
     </state>
+    <state x="227" y="56" key="SettingsEditor/0.23.1440.823@0.23.1440.823" timestamp="1591151752105" />
     <state x="227" y="56" key="SettingsEditor/0.23.1440.824@0.23.1440.824" timestamp="1590632854198" />
     <state x="227" y="56" key="SettingsEditor/0.23.1440.825@0.23.1440.825" timestamp="1590724083925" />
     <state x="227" y="56" key="SettingsEditor/0.23.1440.827@0.23.1440.827" timestamp="1590910708388" />

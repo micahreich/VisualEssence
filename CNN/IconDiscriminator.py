@@ -19,9 +19,6 @@ class IconDiscriminator:
         self.x_train = np.reshape(self.x_train, newshape=(len(self.x_train), 200, 200, 1))
         self.x_test = np.reshape(self.x_test, newshape=(len(self.x_test), 200, 200, 1))
 
-        """self.y_train = tf.one_hot(self.y_train, 2)
-        self.y_test = tf.one_hot(self.y_test, 2)"""
-
         train_ds = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).batch(64)
 
         test_ds = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(64)
