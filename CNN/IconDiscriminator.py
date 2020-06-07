@@ -2,18 +2,19 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import Adam
-import CNNDataGen
+from tensorflow.keras.utils import to_categorical
+import DiscriminatorDataGen
 
 import numpy as np
 
 
 class IconDiscriminator:
     def __init__(self, x_train, y_train, x_test, y_test):
-        self.x_train = x_train
-        self.y_train = y_train
+        self.x_train = x_train/255.0
+        self.y_train = to_categorical(y_train)
 
-        self.x_test = x_test
-        self.y_test = y_test
+        self.x_test = x_test/255.0
+        self.y_test = to_categorical(y_test)
 
     def train_test_split(self):
         self.x_train = np.reshape(self.x_train, newshape=(len(self.x_train), 200, 200, 1))
@@ -65,33 +66,34 @@ class IconDiscriminator:
 
         return model
 
-    def train(self, epochs=100):
+    def train(self, epochs=12):
         strat = tf.distribute.MirroredStrategy()
 
-        train_ds, test_ds = self.train_test_split()
+        with strat.scope():
+            train_ds, test_ds = self.train_test_split()
 
-        model = self.construct_model()
-       
+            model = self.construct_model()
 
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-                      loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                      metrics=[tf.keras.metrics.sparse_categorical_accuracy])
+            model.compile(optimizer='sgd',
+                          loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
+                          metrics=['accuracy'])
 
-        print('\nBeginning model training')
+            print('\nBeginning model training')
 
-        strat.run(model.fit(train_ds, epochs=epochs))
+            model.fit(train_ds, epochs=epochs)
 
-        print('\nBeginning model validation')
+            print('\nBeginning model validation')
 
-        results = model.evaluate(test_ds)
-        print('test loss, test acc:', results)
+            results = model.evaluate(test_ds)
+            print('test loss, test acc:', results)
 
-        model.save('saved_discriminator')
-        print('\nModel saved successfully!')
+            model.save('saved_discriminator')
+            print('\nModel saved successfully!')
 
 
 if __name__ == "__main__":
+    pass
     # Generate training, testing datasets
-    DatasetGen = CNNDataGen.DatasetGenerator(4)
-    DatasetGen.generate_dataset(False)
+    #DatasetGen = CNNDataGen.DatasetGenerator(60000, "/nethome/mreich8/VisualEssence/data/CNN/cnn_data")
+    #DatasetGen.generate_dataset(False)
 

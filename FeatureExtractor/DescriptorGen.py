@@ -40,18 +40,17 @@ class DescriptorGenerator:
 
         return desc_corpus
 
-    def tf_idf(self, train_corpus, n_terms=1):
+    def tf_idf(self, train_corpus, test_sample, n_terms=1):
         tfidf_vectorizer = TfidfVectorizer(use_idf=True, stop_words=self.create_stop_words(
-            'description_data/stopwords.txt'))
+            '/Users/micahreich/Documents/VisualEssence/FeatureExtractor/description_data/stopwords.txt'))
         tfidf_vectorizer.fit_transform(train_corpus)
 
         tfidf_descriptors = []
-
         new_descriptors = []
 
-        for i in range(0, len(train_corpus)):
+        for i in range(0, len(test_sample)):
 
-            tfidf_desc = tfidf_vectorizer.transform([train_corpus[i]])
+            tfidf_desc = tfidf_vectorizer.transform([test_sample[i]])
             feature_array = np.array(tfidf_vectorizer.get_feature_names())
 
             tfidf_sorting = np.argsort(tfidf_desc.toarray()).flatten()[::-1]
@@ -68,6 +67,9 @@ class DescriptorGenerator:
 
 
 Descriptions = DescriptorGenerator()
-data = Descriptions.get_descriptions(os.path.abspath("description_data/DESC450.csv"))
-print(np.array(Descriptions.tf_idf(data))[0])
+data = Descriptions.get_descriptions(os.path.abspath("/Users/micahreich/Documents/VisualEssence/FeatureExtractor/description_data/DESC450.csv"))
+print(Descriptions.tf_idf(data,
+                          ["I'm a fat, biracial bisexual woman. ",
+                           "I'm a funny depressive--aren't all depressives a riot? ",
+                           "I'm a boring drudge, not glamorous or fancy, but fairly dependable."]))
 

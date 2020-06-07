@@ -6,15 +6,16 @@ import numpy as np
 from numpy import asarray
 
 
-def convex_hull(path_to_data, icons, position_vector, n_icons=3):
+def convex_hull(path_to_data, icons, position_vector, ID, n_icons=3):
 
     icon_arrays = []
 
     for i in range(n_icons):
-        background = Image.open(path_to_data + "/" + "blank_icon.png")  # for convex hull images
-        background_icon = Image.open(path_to_data + "/" + "blank_icon.png")  # for real icons
+        # /nethome/mreich8/VisualEssence/
+        background = Image.open(path_to_data[:path_to_data.index("VisualEssence")] + "VisualEssence/CNN/IconGeneration/blank_icon.png")  # for convex hull images
+        background_icon = Image.open(path_to_data[:path_to_data.index("VisualEssence")] + "VisualEssence/CNN/IconGeneration/blank_icon.png")  # for real icons
 
-        icon = invert(io.imread(path_to_data + "/" + icons[i], as_gray=True))  # original icon image
+        icon = invert((255-asarray(Image.open(path_to_data + "/" + icons[i])))[:, :, 3])  # original icon image
         icon_chull = asarray(invert(convex_hull_image(icon)))  # convex hull icon image
         icon_chull_array = asarray(Image.fromarray(icon_chull).resize((120, 120)))  # convex hull image as array
 
@@ -33,13 +34,7 @@ def convex_hull(path_to_data, icons, position_vector, n_icons=3):
 
     overlap_2_icon = np.where(overlap_1_chull == 0, overlap_1_icon, icon_arrays[2][1])
 
-    Image.fromarray(overlap_2_icon).show()
+    image_final = Image.fromarray(overlap_2_icon)
+    #image_final.show()
+    image_final.save(path_to_data + "/R_" + str(ID) + ".png", "PNG")
 
-
-convex_hull('/Users/micahreich/Documents/VisualEssence/CNN/IconGeneration',
-            ['a.png',
-            'b.png',
-            'c.png'],
-            [[100, 100],
-             [50, 75],
-             [150, 125]])
