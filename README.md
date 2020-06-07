@@ -13,6 +13,10 @@ Then train the style k-means clustering model
 # Mode order is: TRAIN
 python3 ClusteringDataGen.py
 ```
+Enter the VisualEssence/CNN directory via command line
+```bash
+cd ../VisualEssence/CNN
+```
 Then download the CNN dataset
 ```python
 # Mode order is: DOWNLOAD, NEG_SAMPLE, PICKLE
