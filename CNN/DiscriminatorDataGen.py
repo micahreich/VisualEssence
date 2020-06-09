@@ -58,7 +58,6 @@ class DatasetGenerator:
                 print("ERROR IN CLASSIFICATION, CONTINUING...")
 
     def generate_pos_vec(self, icon_size=120):
-        #print("inside pos vec")
         position_vector = []
 
         vec_1 = sample(range(60, 140), 2)  # (x, y)
@@ -70,7 +69,6 @@ class DatasetGenerator:
 
             while (position_vector[i][0] + radius * math.cos(angle) + 60 > 200 or position_vector[i][0] + radius * math.cos(angle) - 60 < 0) or \
                   (position_vector[i][1] + radius * math.sin(angle) + 60 > 200 or position_vector[i][1] + radius * math.sin(angle) - 60 < 0):
-                #print("inside while loop")
                 radius = randint(50, 140)
                 angle = random() * 6.28319
                
@@ -81,7 +79,6 @@ class DatasetGenerator:
         return position_vector
 
     def create_negative_sample(self, icons, ID):
-        #print("inside chull")
         ConvexHull.convex_hull(self.data_directory,
                                icons,
                                self.generate_pos_vec(), ID)
@@ -105,9 +102,7 @@ class DatasetGenerator:
                 files.remove(images[2])
 
                 self.create_negative_sample(images, icon_id)
-                #print(np.unique(np.asarray(Image.open("/nethome/mreich8/VisualEssence/data/cnn_data/R_" + str(icon_id) + ".png"))))
                 icon_id += 1
-                #print("ERROR, CONTINUING...")
             except:
                 print("ERROR, CONTINUING")
 
@@ -225,5 +220,6 @@ class DatasetGenerator:
 """if __name__ == "__main__":
     # /nethome/mreich8/VisualEssence/data/CNN/cnn_data
     # RunMode options: DOWNLOAD, NEG_SAMPLE, PICKLE, LOAD_PICKLE
-    DS = DatasetGenerator(60000, "/nethome/mreich8/VisualEssence/data/cnn_data_backup/cnn_data", "PICKLE")
+    # "/nethome/mreich8/VisualEssence/data/cnn_data_backup/cnn_data"
+    DS = DatasetGenerator(40, "/Users/micahreich/Documents/VisualEssence/data/cnn_data", "DOWNLOAD")
     DS.generate_dataset()"""
