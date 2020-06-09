@@ -4,8 +4,8 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 import DiscriminatorDataGen
-
 import numpy as np
+from PIL import Image
 
 
 class IconDiscriminator:
@@ -88,8 +88,14 @@ class IconDiscriminator:
 
             model.evaluate(test_ds)
             # blah
-            model.save('saved_discriminator_2')
+            model.save('saved_discriminator')
             print('\nModel saved successfully!')
+
+    def test(self, path_to_image):
+        model = tf.keras.models.load_model('saved_discriminator')
+        image_arr = (255 - np.asarray(Image.open(path_to_image)))[:, :, 3]
+
+        return model.predict(image_arr/255.0)
 
 
 if __name__ == "__main__":
