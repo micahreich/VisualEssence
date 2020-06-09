@@ -66,15 +66,17 @@ class IconDiscriminator:
 
         return model
 
-    def train(self, epochs=12):
+    def train(self, epochs=20):
         strat = tf.distribute.MirroredStrategy()
 
         with strat.scope():
+            print("GPUS AVALIBLE ", tf.config.experimental.list_physical_devices('GPU'))
+
             train_ds, test_ds = self.train_test_split()
 
             model = self.construct_model()
 
-            model.compile(optimizer='sgd',
+            model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.001),
                           loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
                           metrics=['accuracy'])
 
@@ -84,16 +86,17 @@ class IconDiscriminator:
 
             print('\nBeginning model validation')
 
-            results = model.evaluate(test_ds)
-            print('test loss, test acc:', results)
-
-            model.save('saved_discriminator')
+            model.evaluate(test_ds)
+            # blah
+            model.save('saved_discriminator_2')
             print('\nModel saved successfully!')
 
 
 if __name__ == "__main__":
-    pass
     # Generate training, testing datasets
-    #DatasetGen = CNNDataGen.DatasetGenerator(60000, "/nethome/mreich8/VisualEssence/data/CNN/cnn_data")
-    #DatasetGen.generate_dataset(False)
+    DS = DiscriminatorDataGen.DatasetGenerator(60000, "/nethome/mreich8/VisualEssence/data/cnn_data_backup/cnn_data", "LOAD_PICKLE")
+    data = DS.generate_dataset()
+
+    CNN = IconDiscriminator(data[0], data[1], data[2], data[3])
+    CNN.train()
 

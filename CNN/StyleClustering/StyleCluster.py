@@ -38,6 +38,7 @@ class ClusterModel:
             if r_i_max > 0:
                 black_rows.append(r_i_max)
             r_i_max = 0
+
         return statistics.median(black_rows)
 
     def display_data(self, labels, class_no):
@@ -64,14 +65,18 @@ class ClusterModel:
 
     def train(self, n_samples=1200):
         ds = DatasetGenerator(n_samples, self.data_directory, "LOAD_PICKLE")
-
         _img_arr = ds.generate_dataset()
+        print("DATASET SIZE: {}".format(len(_img_arr)))
+
         pixel_data = []
 
         for i in _img_arr:
-            pixel_data.append(
-                [self.consecutive_pixels(i)]
-            )
+            try:
+                pixel_data.append(
+                    [self.consecutive_pixels(i)]
+                )
+            except:
+                print("ERROR IN CONSECUTIVE PX COUNT, CONTINUING...")
 
         kmeans = KMeans(n_clusters=3, random_state=0, max_iter=400).fit(pixel_data)
         self.save_model(kmeans)
@@ -80,4 +85,6 @@ class ClusterModel:
 
 
 """if __name__ == "__main__":
-    cluster = StyleCluster("/Users/micahreich/Documents/VisualEssence/data/style_data", "TRAIN")"""
+    cluster = ClusterModel("/nethome/mreich8/VisualEssence/data/style_data", "TRAIN")
+    #cluster.train()
+    print(cluster.predict("/nethome/mreich8/VisualEssence/data/style_data/I_1158669.png"))"""

@@ -9,7 +9,7 @@ from numpy import asarray
 def convex_hull(path_to_data, icons, position_vector, ID, n_icons=3):
 
     icon_arrays = []
-
+    #print("inside chull FUNC")
     for i in range(n_icons):
         # /nethome/mreich8/VisualEssence/
         background = Image.open(path_to_data[:path_to_data.index("VisualEssence")] + "VisualEssence/CNN/IconGeneration/blank_icon.png")  # for convex hull images

@@ -17,7 +17,7 @@ class DatasetGenerator:
         try:
             os.mkdir(data_directory)
         except FileExistsError:
-            print(f'WARNING: DIRECTORY {data_directory} ALREADY EXISTS')
+            print("WARNING: DIRECTORY {} ALREADY EXISTS".format(data_directory))
 
         self.n_samples = n_samples
         self.data_directory = data_directory
@@ -29,8 +29,8 @@ class DatasetGenerator:
         icon_ids = sample(range(1, 3368879), self.n_samples)  # 3368879 icons in NP database
 
         for i in range(len(icon_ids)):
-            if i+1 % 1000 == 0:
-                print(f"DOWNLOADED {i+1} IMAGES, {(i+1 / self.n_samples) * 100}% COMPLETE")
+            if (i+1) % 100 == 0:
+                print("DOWNLOADED {} IMAGES, {}% COMPLETE".format(i+1, ((i+1)/self.n_samples)*100))
 
             img_url = "https://static.thenounproject.com/png/{}-200.png".format(icon_ids[i])
 
@@ -44,7 +44,7 @@ class DatasetGenerator:
         images = []
         for i in os.listdir(self.data_directory):
             try:
-                current_image = self.data_directory + f"/{i}"
+                current_image = self.data_directory + "/{}".format(i)
                 _img_1 = Image.open(current_image)
                 _img_arr = ((255 - np.asarray(_img_1))[:, :, 3])
 
@@ -78,5 +78,5 @@ class DatasetGenerator:
 
 
 """if __name__ == "__main__":
-    DS = DatasetGenerator(40, "/Users/micahreich/Documents/VisualEssence/data/style_data", "PICKLE")
+    DS = DatasetGenerator(1200, "/nethome/mreich8/VisualEssence/data/style_data", "PICKLE")
     DS.generate_dataset()"""
