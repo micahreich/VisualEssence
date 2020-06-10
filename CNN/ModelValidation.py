@@ -12,13 +12,13 @@ from IconGeneration import ConvexHull
 
 
 class SearchPrediction:
-    def __init__(self, data_directory, n_positions=1000):
+    def __init__(self, data_directory, n_positions=250):
         self.data_directory = data_directory
         self.n_positions = n_positions
 
     def predict(self, image_arr):
         model = tf.keras.models.load_model('saved_discriminator')
-        image_arr = (255 - np.asarray(image_arr))[:, :, :, 2]
+        image_arr = np.asarray(image_arr)
 
         return model.predict(image_arr / 255.0)
 
@@ -54,20 +54,27 @@ class SearchPrediction:
                                    icons, self.generate_pos_vec(), i)
             samples.append(np.asarray(Image.open(self.data_directory + "/P_" + str(i) + ".png"))[:, :, 2])
 
-        return np.reshape(samples, (len(samples), 200, 200, 1))
+        return samples
 
     def get_performance_samples(self):
-        arrangements = self.create_samples()
-        softmax_scores = self.predict(arrangements)[:, 1]  # class 1 scores
+        strat = tf.distribute.MirroredStrategy()
 
-        positive_arrangement = Image.fromarray(arrangements[softmax_scores.index(max(softmax_scores))])
-        negative_arrangement = Image.fromarray(arrangements[softmax_scores.index(min(softmax_scores))])
+        arrangements = self.create_samples()
+
+        model = tf.keras.models.load_model('saved_discriminator')
+        softmax_scores = model.predict((np.reshape(arrangements, (-1, 200, 200, 1))/255.0))[:, 1]  # class 1 scores
+      
+        idx_max = np.where(softmax_scores == np.amax(softmax_scores))[0][0]
+        idx_min = np.where(softmax_scores == np.amin(softmax_scores))[0][0]
+
+        positive_arrangement = Image.fromarray(arrangements[idx_max])
+        negative_arrangement = Image.fromarray(arrangements[idx_min])
 
         positive_arrangement.save("Highest_Scoring_Sample.png", "PNG")
         negative_arrangement.save("Lowest_Scoring_Sample.png", "PNG")
 
-        print("HIGHEST SCORE: ", max(softmax_scores))
-        print("LOWEST SCORE: ", min(softmax_scores))
+        print("HIGHEST SCORE: ", softmax_scores[idx_max])
+        print("LOWEST SCORE: ", softmax_scores[idx_min])
 
 
 if __name__ == "__main__":
