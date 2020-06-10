@@ -2,16 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d99f7d91-5553-4960-8a43-f95badaf2466" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Generator/PosRegression.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CNN/ModelValidation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CNN/IconDiscriminator.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/IconDiscriminator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/GAN.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/IconDataGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/IconDataGen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/IconGen_v1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/IconGen_v2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/MaskGen.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/icgen2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IconGenerator/outlineCr2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN/IconGeneration/ConvexHull.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/IconGeneration/ConvexHull.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

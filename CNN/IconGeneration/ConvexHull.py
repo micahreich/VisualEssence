@@ -36,8 +36,5 @@ def convex_hull(path_to_data, icons, position_vector, ID, n_icons=3):
 
     image_final = Image.fromarray(overlap_2_icon)
     #image_final.show()
-    image_final.save(path_to_data + "/R_" + str(ID) + ".png", "PNG")
+    image_final.save(path_to_data + "/P_" + str(ID) + ".png", "PNG")
 
-convex_hull("/Users/micahreich/Documents/VisualEssence/data/cnn_data",
-            ["I_1087-200.png", "I_223281-200.png", "I_656087-200.png"],
-            [[50, 75], [75, 100], [100, 125]], 5)

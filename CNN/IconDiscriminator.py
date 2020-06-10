@@ -91,12 +91,6 @@ class IconDiscriminator:
             model.save('saved_discriminator')
             print('\nModel saved successfully!')
 
-    def test(self, path_to_image):
-        model = tf.keras.models.load_model('saved_discriminator')
-        image_arr = (255 - np.asarray(Image.open(path_to_image)))[:, :, 3]
-
-        return model.predict(image_arr/255.0)
-
 
 if __name__ == "__main__":
     # Generate training, testing datasets
