@@ -80,16 +80,14 @@ class IconDiscriminator:
                           loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
                           metrics=['accuracy'])
 
-            print('\nBeginning model training')
+        print('\nBeginning model training')
+        model.fit(train_ds, epochs=epochs)
 
-            model.fit(train_ds, epochs=epochs)
+        print('\nBeginning model validation')
+        model.evaluate(test_ds)
 
-            print('\nBeginning model validation')
-
-            model.evaluate(test_ds)
-            # blah
-            model.save('saved_discriminator')
-            print('\nModel saved successfully!')
+        model.save('saved_discriminator')
+        print('\nModel saved successfully!')
 
 
 if __name__ == "__main__":

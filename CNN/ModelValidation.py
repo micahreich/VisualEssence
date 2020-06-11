@@ -57,12 +57,10 @@ class SearchPrediction:
         return samples
 
     def get_performance_samples(self):
-        strat = tf.distribute.MirroredStrategy()
+        model = tf.keras.models.load_model('saved_discriminator')
 
         arrangements = self.create_samples()
-
-        model = tf.keras.models.load_model('saved_discriminator')
-        softmax_scores = model.predict((np.reshape(arrangements, (-1, 200, 200, 1))/255.0))[:, 1]  # class 1 scores
+        softmax_scores = model.predict((np.reshape(arrangements, (-1, 200, 200, 1))/255.0), batch_size=64)[:, 1]  # class 1 scores
       
         idx_max = np.where(softmax_scores == np.amax(softmax_scores))[0][0]
         idx_min = np.where(softmax_scores == np.amin(softmax_scores))[0][0]
