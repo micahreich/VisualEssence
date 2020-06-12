@@ -45,7 +45,7 @@ class SearchPrediction:
 
         return position_vector
 
-    def create_samples(self):
+    def generate_samples(self):
         icons = sample(os.listdir(self.data_directory), 3)
         samples = []
 
@@ -59,9 +59,9 @@ class SearchPrediction:
     def get_performance_samples(self):
         model = tf.keras.models.load_model('saved_discriminator')
 
-        arrangements = self.create_samples()
+        arrangements = self.generate_samples()
         softmax_scores = model.predict((np.reshape(arrangements, (-1, 200, 200, 1))/255.0), batch_size=64)[:, 1]  # class 1 scores
-      
+
         idx_max = np.where(softmax_scores == np.amax(softmax_scores))[0][0]
         idx_min = np.where(softmax_scores == np.amin(softmax_scores))[0][0]
 

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class PositionRegression():
+class PositionGenerator:
     def __init__(self, data_directory):
         self.data_directory = data_directory
 

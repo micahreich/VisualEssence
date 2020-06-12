@@ -55,6 +55,7 @@ class DatasetGenerator:
                     if current_count % 100 == 0:
                         print("DOWNLOADED {} IMAGES, {}% COMPLETE".format(current_count ,int(current_count / self.n_samples)*100))
             except:
+                os.remove(self.data_directory + "/I_" + str(random_id) + ".png")
                 print("ERROR IN CLASSIFICATION, CONTINUING...")
 
     def generate_pos_vec(self, icon_size=120):
