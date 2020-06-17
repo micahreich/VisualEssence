@@ -95,33 +95,50 @@ class PositionGenerator:
         #with strat.scope():
         for i in range(1):
             print("GPUS AVALIBLE ", tf.config.experimental.list_physical_devices('GPU'))
-
             model = self.construct_model()
 
             optimizer = tf.keras.optimizers.Adadelta(learning_rate=0.01)
             loss_fn = tf.keras.losses.MeanSquaredError(reduction=tf.keras.losses.Reduction.SUM)
+
             train_acc_metric = tf.keras.metrics.MeanSquaredError()
+            val_acc_metric = tf.keras.metrics.MeanSquaredError()
+
+            @tf.function
+            def train_step(x, y):
+                with tf.GradientTape() as tape:
+                    forward_pass = model([x[:, 0], x[:, 1], x[:, 2]])
+                    loss_value = loss_fn(y, forward_pass)
+
+                grads = tape.gradient(loss_value, model.trainable_weights)
+                optimizer.apply_gradients(zip(grads, model.trainable_weights))
+                train_acc_metric.update_state(y, forward_pass)
+
+                return loss_value
+
+            @tf.function
+            def test_step(x, y):
+                val_pass = model([x[:, 0], x[:, 1], x[:, 2]])
+                val_acc_metric.update_state(y, val_pass)
 
             for epoch in range(epochs):
-                print("\nSTARTING EPOCH {}".format(epoch))
+                print("\n\nSTARTING EPOCH {}".format(epoch))
 
                 for step, (x_batch_train, y_batch_train) in enumerate(self.train_ds):
-                    with tf.GradientTape() as tape:
-                        forward_pass = model([x_batch_train[:, 0], x_batch_train[:, 1], x_batch_train[:, 2]])
-                        loss_value = loss_fn(y_batch_train, forward_pass)
-
-                    grads = tape.gradient(loss_value, model.trainable_weights)
-
-                    optimizer.apply_gradients(zip(grads, model.trainable_weights))
-
-                    train_acc_metric.update_state(y_batch_train, forward_pass)
+                    loss_value = train_step(x_batch_train, y_batch_train)
 
                     if step % 100 == 0:
                         print("STEP {} TRAINING LOSS {:.4f}".format(step, loss_value))
 
                 train_acc = train_acc_metric.result()
-                print("MEAN SQUARED ERROR OVER EPOCH: {:.2f}".format(float(train_acc)))
+                print("MEAN SQUARED ERROR OVER EPOCH: {:.4f}".format(train_acc))
                 train_acc_metric.reset_states()
+
+                for x_batch_val, y_batch_val in self.test_ds:
+                    test_step(x_batch_val, y_batch_val)
+
+                val_acc = val_acc_metric.result()
+                val_acc_metric.reset_states()
+                print("VALIDATION ERROR: {:.4f}".format(val_acc))
 
         model.save('saved_posgen')
         print('\nModel saved successfully!')
