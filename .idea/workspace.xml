@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d99f7d91-5553-4960-8a43-f95badaf2466" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Generator/GeneratorDataGen.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Generator/IconGeneration/ConvexHull.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNN/DiscriminatorDataGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/DiscriminatorDataGen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CNN/ModelValidation.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN/ModelValidation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Generator/PosRegression.py" beforeDir="false" afterPath="$PROJECT_DIR$/Generator/PositionGenerator.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,13 +38,6 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/Generator" />
-      <recent name="$PROJECT_DIR$/CNN/IconGeneration" />
-      <recent name="$PROJECT_DIR$/CNN/cnn_data" />
-      <recent name="$PROJECT_DIR$/CNN/evaluation" />
-      <recent name="$PROJECT_DIR$/CNN" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/data/cnn_data" />
@@ -57,8 +45,15 @@
       <recent name="$PROJECT_DIR$/CNN" />
       <recent name="$PROJECT_DIR$/CNN/IconGeneration" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Generator" />
+      <recent name="$PROJECT_DIR$/CNN/IconGeneration" />
+      <recent name="$PROJECT_DIR$/CNN/cnn_data" />
+      <recent name="$PROJECT_DIR$/CNN/evaluation" />
+      <recent name="$PROJECT_DIR$/CNN" />
+    </key>
   </component>
-  <component name="RunManager" selected="Python.GeneratorDataGen">
+  <component name="RunManager" selected="Python.PositionGen_2D">
     <configuration name="ConvexHull" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="VisualEssence" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -101,27 +96,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="DiscriminatorDataGen" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="VisualEssence" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/CNN" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CNN/DiscriminatorDataGen.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="GeneratorDataGen" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="VisualEssence" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -156,6 +130,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CNN/DataVis/PixelHistogram.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="PositionGen_2D" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="VisualEssence" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Generator" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Generator/PositionGen_2D.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -210,18 +205,18 @@
       <item itemvalue="Python.Unnamed" />
       <item itemvalue="Python.DescriptorGen" />
       <item itemvalue="Python.ConvexHull" />
-      <item itemvalue="Python.DiscriminatorDataGen" />
       <item itemvalue="Python.PixelHistogram" />
       <item itemvalue="Python.PositionGenerator" />
       <item itemvalue="Python.GeneratorDataGen" />
+      <item itemvalue="Python.PositionGen_2D" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.PositionGen_2D" />
         <item itemvalue="Python.GeneratorDataGen" />
         <item itemvalue="Python.PositionGenerator" />
         <item itemvalue="Python.PixelHistogram" />
         <item itemvalue="Python.ConvexHull" />
-        <item itemvalue="Python.DiscriminatorDataGen" />
       </list>
     </recent_temporary>
   </component>
@@ -269,35 +264,39 @@
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.824@0.23.1440.824" timestamp="1591166456861" />
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.825@0.23.1440.825" timestamp="1591402216274" />
     <state x="459" y="171" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.827@0.23.1440.827" timestamp="1591337583255" />
-    <state width="1380" height="151" key="GridCell.Tab.0.bottom" timestamp="1591855655591">
-      <screen x="0" y="23" width="1440" height="825" />
+    <state width="1503" height="210" key="GridCell.Tab.0.bottom" timestamp="1592432905501">
+      <screen x="-213" y="-1057" width="1920" height="1057" />
     </state>
     <state width="1380" height="152" key="GridCell.Tab.0.bottom/0.23.1440.823@0.23.1440.823" timestamp="1591682387481" />
     <state width="1380" height="151" key="GridCell.Tab.0.bottom/0.23.1440.824@0.23.1440.824" timestamp="1591849310749" />
+    <state width="1503" height="210" key="GridCell.Tab.0.bottom/0.23.1440.825/-213.-1057.1920.1057@-213.-1057.1920.1057" timestamp="1592432905501" />
     <state width="1380" height="151" key="GridCell.Tab.0.bottom/0.23.1440.825@0.23.1440.825" timestamp="1591855655591" />
     <state width="1379" height="143" key="GridCell.Tab.0.bottom/0.23.1440.827@0.23.1440.827" timestamp="1591670382909" />
     <state width="1379" height="135" key="GridCell.Tab.0.bottom/0.23.1440.828@0.23.1440.828" timestamp="1590985540879" />
-    <state width="1380" height="151" key="GridCell.Tab.0.center" timestamp="1591855655590">
-      <screen x="0" y="23" width="1440" height="825" />
+    <state width="1503" height="210" key="GridCell.Tab.0.center" timestamp="1592432905500">
+      <screen x="-213" y="-1057" width="1920" height="1057" />
     </state>
     <state width="1380" height="152" key="GridCell.Tab.0.center/0.23.1440.823@0.23.1440.823" timestamp="1591682387481" />
     <state width="1380" height="151" key="GridCell.Tab.0.center/0.23.1440.824@0.23.1440.824" timestamp="1591849310748" />
+    <state width="1503" height="210" key="GridCell.Tab.0.center/0.23.1440.825/-213.-1057.1920.1057@-213.-1057.1920.1057" timestamp="1592432905500" />
     <state width="1380" height="151" key="GridCell.Tab.0.center/0.23.1440.825@0.23.1440.825" timestamp="1591855655590" />
     <state width="1379" height="143" key="GridCell.Tab.0.center/0.23.1440.827@0.23.1440.827" timestamp="1591670382908" />
     <state width="1379" height="135" key="GridCell.Tab.0.center/0.23.1440.828@0.23.1440.828" timestamp="1590985540878" />
-    <state width="1380" height="151" key="GridCell.Tab.0.left" timestamp="1591855655589">
-      <screen x="0" y="23" width="1440" height="825" />
+    <state width="1503" height="210" key="GridCell.Tab.0.left" timestamp="1592432905500">
+      <screen x="-213" y="-1057" width="1920" height="1057" />
     </state>
     <state width="1380" height="152" key="GridCell.Tab.0.left/0.23.1440.823@0.23.1440.823" timestamp="1591682387480" />
     <state width="1380" height="151" key="GridCell.Tab.0.left/0.23.1440.824@0.23.1440.824" timestamp="1591849310747" />
+    <state width="1503" height="210" key="GridCell.Tab.0.left/0.23.1440.825/-213.-1057.1920.1057@-213.-1057.1920.1057" timestamp="1592432905500" />
     <state width="1380" height="151" key="GridCell.Tab.0.left/0.23.1440.825@0.23.1440.825" timestamp="1591855655589" />
     <state width="1379" height="143" key="GridCell.Tab.0.left/0.23.1440.827@0.23.1440.827" timestamp="1591670382908" />
     <state width="1379" height="135" key="GridCell.Tab.0.left/0.23.1440.828@0.23.1440.828" timestamp="1590985540877" />
-    <state width="1380" height="151" key="GridCell.Tab.0.right" timestamp="1591855655590">
-      <screen x="0" y="23" width="1440" height="825" />
+    <state width="1503" height="210" key="GridCell.Tab.0.right" timestamp="1592432905501">
+      <screen x="-213" y="-1057" width="1920" height="1057" />
     </state>
     <state width="1380" height="152" key="GridCell.Tab.0.right/0.23.1440.823@0.23.1440.823" timestamp="1591682387481" />
     <state width="1380" height="151" key="GridCell.Tab.0.right/0.23.1440.824@0.23.1440.824" timestamp="1591849310748" />
+    <state width="1503" height="210" key="GridCell.Tab.0.right/0.23.1440.825/-213.-1057.1920.1057@-213.-1057.1920.1057" timestamp="1592432905501" />
     <state width="1380" height="151" key="GridCell.Tab.0.right/0.23.1440.825@0.23.1440.825" timestamp="1591855655590" />
     <state width="1379" height="143" key="GridCell.Tab.0.right/0.23.1440.827@0.23.1440.827" timestamp="1591670382909" />
     <state width="1379" height="135" key="GridCell.Tab.0.right/0.23.1440.828@0.23.1440.828" timestamp="1590985540878" />
