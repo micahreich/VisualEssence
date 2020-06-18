@@ -71,13 +71,13 @@ class PositionGenerator:
 
         conv_2 = tf.keras.layers.Conv2D(filters=96, kernel_size=(3, 3), strides=(1, 1), padding='same', activation='relu')(concat)
         conv_2 = tf.keras.layers.Conv2D(filters=96, kernel_size=(3, 3), strides=(1, 1), padding='same', activation='relu')(conv_2)
-        conv_2 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(2, 2))(conv_2)
+        max_pool_2 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(2, 2))(conv_2)
 
-        conv_3 = tf.keras.layers.Conv2D(filters=192, kernel_size=(3, 3), strides=(1, 1), padding='same', activation='relu')(conv_2)
+        conv_3 = tf.keras.layers.Conv2D(filters=192, kernel_size=(3, 3), strides=(1, 1), padding='same', activation='relu')(max_pool_2)
         conv_3 = tf.keras.layers.Conv2D(filters=192, kernel_size=(3, 3), strides=(2, 2), padding='same', activation='relu')(conv_3)
-        conv_3 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(2, 2))(conv_3)
+        max_pool_3 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(2, 2))(conv_3)
 
-        conv_4 = tf.keras.layers.Conv2D(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same', activation='relu')(conv_3)
+        conv_4 = tf.keras.layers.Conv2D(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same', activation='relu')(max_pool_3)
         conv_4 = tf.keras.layers.Conv2D(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same', activation='relu')(conv_4)
         conv_4 = tf.keras.layers.Conv2D(filters=384, kernel_size=(3, 3), strides=(2, 2), padding='same', activation='relu')(conv_4)
 

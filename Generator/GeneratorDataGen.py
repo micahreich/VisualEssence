@@ -10,11 +10,12 @@ from IconGeneration import ConvexHull
 
 
 class DatasetGenerator:
-    def __init__(self, n_samples, data_directory, slurm_array_task_id=sys.argv[1]):
+    def __init__(self, n_samples, data_directory, run_mode, slurm_array_task_id=sys.argv[1]):
         self.n_samples = n_samples  # n_samples must be divisible by 3 * n_partitions
         self.data_directory = data_directory
         self.n_partitions = 20
         self.n_searches = 250
+        self.run_mode = run_mode
         self.slurm_array_task_id = slurm_array_task_id
 
     def generate_pos_vec(self, icon_size=120):
@@ -116,5 +117,4 @@ class DatasetGenerator:
 
 
 if __name__ == "__main__":
-    DS = DatasetGenerator(180, "/Users/micahreich/Desktop/Screenshots")
-
+    DS = DatasetGenerator(180, "/Users/micahreich/Desktop/Screenshots", )
