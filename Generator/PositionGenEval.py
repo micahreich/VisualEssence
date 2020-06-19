@@ -8,37 +8,35 @@ import os
 class PositionGenEval:
     def __init__(self, data_directory):
         self.data_directory = data_directory
-        self.path_to_model = data_directory[data_directory.find("VisualEssence")] + "VisualEssence/Generator/saved_pos_gen"
+        self.path_to_model = data_directory[:data_directory.find("VisualEssence")] + "VisualEssence/Generator/saved_pos_gen_2"
 
     def create_sample(self, icons, position_vector):
         chull_image = ConvexHull.convex_hull(self.data_directory,
                                              icons, position_vector)
-        Image.save(chull_image, "PosGenSample_{}".format(random.randint(0, 100)), "PNG")
+        chull_image.save("PosGenSample_{}.png".format(random.randint(0, 100)), "PNG")
 
     def predict(self, icon_paths):
         icons_array = []
         icons_dstack = []
 
+        icon_triplet = []
         for i in range(len(icon_paths)):
-            icon_triplet = []
-            for j in range(len(icon_paths[i])):
-                icon_triplet.append(255 - np.asarray(Image.open(icon_paths[i][j]))[:, :, 3])
-            icons_array.append(icon_triplet)
+            icon_triplet.append(255 - np.asarray(Image.open(self.data_directory + "/" + icon_paths[i]))[:, :, 3])
+        icons_array.append(icon_triplet)
 
         for i in range(len(icons_array)):
             icons_dstack.append(np.dstack((icons_array[i][0], icons_array[i][1], icons_array[i][2])))
 
-        icons_dstack = np.asarray(icons_dstack).reshape(shape=(len(icons_dstack), 1, 200, 200, 3))
+        icons_dstack = np.reshape(np.asarray(icons_dstack), (len(icons_dstack), 1, 200, 200, 3))
 
-        icons_dstack /= 255.0
+        icons_dstack = np.asarray(icons_dstack) / 255.0
 
         prediction_vectors = []
         model = tf.keras.models.load_model(self.path_to_model)
 
         for i in range(len(icons_dstack)):
-            tf.keras.backend.clear_session()
             prediction_vectors.append(
-                model.predict(icons_dstack[i], batch_size=64)
+                model.predict(icons_dstack, batch_size=64)
             )
 
         return prediction_vectors
@@ -58,11 +56,16 @@ class PositionGenEval:
             for fpath in icon_triplet:
                 data_path.remove(fpath)
 
-        for i in range(len(icon_paths)):
-            for j in range(len(icon_paths[i])):
-                icon_paths[i][j] = self.data_directory + "/" + icon_paths[i][j]
-
         for i in range(n_samples):
+            pred = self.predict(icon_paths[i])
+            print(pred)
+            pred_reshape = (np.reshape(self.predict(icon_paths[i]), newshape=(3, 2))).astype(np.int)
+            print(pred_reshape*200)
             self.create_sample(
-                icons=icon_paths[i], position_vector=np.reshape(self.predict(icon_paths[i]), newshape=(3, 2))
+                icons=icon_paths[i], position_vector=pred_reshape
             )
+
+
+if __name__ == "__main__":
+    PE = PositionGenEval("/nethome/mreich8/VisualEssence/data/generator_data")
+    PE.generate_samples()
