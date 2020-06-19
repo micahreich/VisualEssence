@@ -1,5 +1,5 @@
 from PIL import Image
-from random import randint, sample, random, shuffle
+from random import randint, sample, random, shuffle, choice
 import os
 import numpy as np
 import pickle
@@ -10,34 +10,35 @@ from IconGeneration import ConvexHull
 
 
 class DatasetGenerator:
-    def __init__(self, n_samples, data_directory, run_mode, slurm_array_task_id=sys.argv[1]):
+    """def __init__(self, n_samples, data_directory, run_mode, slurm_array_task_id=sys.argv[1]):
         self.n_samples = n_samples  # n_samples must be divisible by 3 * n_partitions
         self.data_directory = data_directory
         self.n_partitions = 20
         self.n_searches = 250
         self.run_mode = run_mode
-        self.slurm_array_task_id = slurm_array_task_id
+        self.slurm_array_task_id = slurm_array_task_id"""
 
-    def generate_pos_vec(self, icon_size=120):
-        position_vector = []
+    def generate_pos_vec(self, icon_size=120, n_gutters=10, difference_factor=15):
+        position_vector = np.zeros(shape=(3, 2)).astype(np.int)
+        position_vector_gutters = np.zeros(shape=(3, 2)).astype(np.int)
 
-        vec_1 = sample(range(60, 140), 2)  # (x, y)
-        position_vector.append(vec_1)
+        gutter_width = 200 / n_gutters
+        for i in range(3):
+            gutter_range_x = choice([i for i in range(2, n_gutters-1) if i not in position_vector_gutters[:,0]])
+            gutter_range_y = choice([i for i in range(2, n_gutters-1) if i not in position_vector_gutters[:,1]])
 
-        for i in range(2):
-            radius = randint(50, 140)
-            angle = random() * 6.28319  # 0 to 2pi radians
+            random_variance_x = randint(-difference_factor, difference_factor)
+            random_variance_y = randint(-difference_factor, difference_factor)
 
-            while (position_vector[i][0] + radius * math.cos(angle) + 60 > 200 or position_vector[i][
-                0] + radius * math.cos(angle) - 60 < 0) or \
-                    (position_vector[i][1] + radius * math.sin(angle) + 60 > 200 or position_vector[i][
-                        1] + radius * math.sin(angle) - 60 < 0):
-                radius = randint(50, 140)
-                angle = random() * 6.28319
+            random_gutter_coord = [
+                int((gutter_range_x * gutter_width) - (gutter_width / 2)) + random_variance_x,
+                int((gutter_range_y * gutter_width) - (gutter_width / 2)) + random_variance_y
+            ]
 
-            vec = [int(position_vector[i][0] + radius * math.cos(angle)),
-                   int(position_vector[i][1] + radius * math.sin(angle))]
-            position_vector.append(vec)
+            position_vector[i] = random_gutter_coord
+            position_vector_gutters[i] = [gutter_range_x, gutter_range_y]
+
+        position_vector = position_vector.astype(int).tolist()
 
         return position_vector
 
@@ -97,7 +98,7 @@ class DatasetGenerator:
 
         for i in range(len(partitions)):
             if (i+1) % 50 == 0:
-                print("GENERATED {} LABELS, {}% COMPLETE".format((i+1), int(((i+1) / (self.n_samples / 3)) * 100)))
+                print("GENERATED {} LABELS, {}% COMPLETE".format((i+1), int((i+1)/len(partitions))))
 
             samples, position_vectors = self.generate_samples(partitions[i])
             idx_max = self.highest_sample(samples)
@@ -109,6 +110,7 @@ class DatasetGenerator:
                 image_triplet.append((255 - np.asarray(Image.open(partitions[i][j])))[:, :, 3])
 
             images.append(image_triplet)
+            tf.keras.backend.clear_session()
 
         print("GENERATED {} LABELS FOR {} IMAGE TRIPLETS".format(len(position_vector_labels), len(images)))
 
@@ -117,4 +119,4 @@ class DatasetGenerator:
 
 
 if __name__ == "__main__":
-    DS = DatasetGenerator(180, "/Users/micahreich/Desktop/Screenshots", )
+    DS = DatasetGenerator().generate_pos_vec()

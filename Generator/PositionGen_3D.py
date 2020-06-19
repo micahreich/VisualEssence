@@ -49,53 +49,130 @@ class Preprocessing:
         self.y_train = np.reshape(self.y_train, newshape=(len(self.y_train), 6))
         self.y_test = np.reshape(self.y_test, newshape=(len(self.y_test), 6))
 
-        train_ds = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).shuffle(len(self.x_train)).batch(32)
-        test_ds = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).shuffle(len(self.x_test)).batch(32)
+        train_ds = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).shuffle(len(self.x_train))
+        test_ds = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).shuffle(len(self.x_test))
 
         return train_ds, test_ds
 
 
 class PositionGenerator:
     def __init__(self, train_ds, test_ds):
-        self.train_ds = train_ds
-        self.test_ds = test_ds
+        self.BATCH_SIZE = 64
+        self.EPOCHS = 12
 
-    def construct_model(self):
-        input = tf.keras.layers.Input(shape=(1, 200, 200, 3))
+        self.train_ds = train_ds.batch(self.BATCH_SIZE)
+        self.test_ds = test_ds.batch(self.BATCH_SIZE)
 
-        conv_1 = tf.keras.layers.Conv3D(filters=32, kernel_size=3, strides=1, padding='same', data_format='channels_last', activation='relu')(input)
-        conv_1 = tf.keras.layers.Conv3D(filters=64, kernel_size=3, strides=1, padding='same', data_format='channels_last', activation='relu')(conv_1)
-        max_pool_1 = tf.keras.layers.MaxPool3D(pool_size=2, padding='same', data_format='channels_last', strides=2)(conv_1)
+    def conv_block(self, input, kernel_size, filters, bn_axis=-1, strides=(2, 2, 2)):
+        filter_1, filter_2, filter_3 = filters
+        kernel_size_1, kernel_size_2, kernel_size_3 = kernel_size
 
-        conv_2 = tf.keras.layers.Conv3D(filters=128, kernel_size=3, strides=1, padding='same', data_format='channels_last', activation='relu')(max_pool_1)
-        conv_2 = tf.keras.layers.Conv3D(filters=128, kernel_size=3, strides=1, padding='same', data_format='channels_last', activation='relu')(conv_2)
-        max_pool_2 = tf.keras.layers.MaxPool3D(pool_size=2, strides=2, padding='same', data_format='channels_last',)(conv_2)
+        x = tf.keras.layers.Conv3D(filter_1, kernel_size_1, padding='same', strides=strides)(input)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation(activation='relu')(x)
 
-        conv_3 = tf.keras.layers.Conv3D(filters=256, kernel_size=3, strides=2, padding='same', data_format='channels_last', activation='relu')(max_pool_2)
-        conv_3 = tf.keras.layers.Conv3D(filters=256, kernel_size=3, strides=2, padding='same', data_format='channels_last', activation='relu')(conv_3)
-        conv_3 = tf.keras.layers.Conv3D(filters=256, kernel_size=3, strides=2, padding='same', data_format='channels_last', activation='relu')(conv_3)
+        x = tf.keras.layers.Conv3D(filter_2, kernel_size_2, padding='same')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation(activation='relu')(x)
 
-        flatten = tf.keras.layers.Flatten()(conv_3)
-        dense_1 = tf.keras.layers.Dense(units=4096, activation="relu")(flatten)
-        dense_2 = tf.keras.layers.Dense(units=6, activation="relu")(dense_1)
+        x = tf.keras.layers.Conv3D(filter_3, kernel_size_3, padding='same')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
 
-        model = tf.keras.Model(inputs=input, outputs=dense_2)
+        z = tf.keras.layers.Conv3D(filter_3, kernel_size_3, padding='same', strides=strides)(input)
+        z = tf.keras.layers.BatchNormalization()(z)
+
+        x = tf.keras.layers.add([x, z])
+        x = tf.keras.layers.Activation(activation='relu')(x)
+
+        return x
+
+    def identity_block(self, input, kernel_size, filters, bn_axis=-1, strides=(2, 2, 2)):
+        filter_1, filter_2, filter_3 = filters
+        kernel_size_1, kernel_size_2, kernel_size_3 = kernel_size
+
+        x = tf.keras.layers.Conv3D(filter_1, kernel_size_1, padding='same')(input)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation(activation='relu')(x)
+
+        x = tf.keras.layers.Conv3D(filter_2, kernel_size_2, padding='same')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation(activation='relu')(x)
+
+        x = tf.keras.layers.Conv3D(filter_3, kernel_size_3, padding='same')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+
+        x = tf.keras.layers.add([x, input])
+        x = tf.keras.layers.Activation(activation='relu')(x)
+
+        return x
+
+    def ResNet3D(self, bn_axis=-1):
+        stacked_input = tf.keras.layers.Input(shape=(1, 224, 224, 3))
+
+        # Input Conv Block
+        x = tf.keras.layers.ZeroPadding3D(padding=(3, 3, 3))(stacked_input)
+        x = tf.keras.layers.Conv3D(64,
+                                   (7, 7, 7),
+                                   strides=(2, 2, 2),
+                                   padding='same')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation(activation='relu')(x)
+        x = tf.keras.layers.ZeroPadding3D(padding=(1, 1, 1))(x)
+        x = tf.keras.layers.MaxPool3D(pool_size=(3, 3, 3), strides=(2, 2, 2))(x)
+
+        # Conv Block 1
+        x = self.conv_block(x, [1, 3, 1], [64, 64, 256])
+
+        # Identity x 2
+        x = self.identity_block(x, [1, 3, 1], [64, 64, 256])
+        x = self.identity_block(x, [1, 3, 1], [64, 64, 256])
+
+        # Conv Block 2
+        x = self.conv_block(x, [1, 3, 1], [128, 128, 512])
+
+        # Identity x 3
+        x = self.identity_block(x, [1, 3, 1], [128, 128, 512])
+        x = self.identity_block(x, [1, 3, 1], [128, 128, 512])
+        x = self.identity_block(x, [1, 3, 1], [128, 128, 512])
+
+        # Conv Block 3
+        x = self.conv_block(x, [1, 3, 1], [256, 256, 1024])
+
+        # Identity x 5
+        x = self.identity_block(x, [1, 3, 1], [256, 256, 1024])
+        x = self.identity_block(x, [1, 3, 1], [256, 256, 1024])
+        x = self.identity_block(x, [1, 3, 1], [256, 256, 1024])
+        x = self.identity_block(x, [1, 3, 1], [256, 256, 1024])
+        x = self.identity_block(x, [1, 3, 1], [256, 256, 1024])
+
+        # Conv Block 4
+        x = self.conv_block(x, [1, 3, 1], [512, 512, 2048])
+
+        # Identity x 2
+        x = self.identity_block(x, [1, 3, 1], [512, 512, 2048])
+        x = self.identity_block(x, [1, 3, 1], [512, 512, 2048])
+
+        # Output
+        x = tf.keras.layers.GlobalAveragePooling3D()(x)
+        x = tf.keras.layers.Dense(units=6, activation='relu')(x)
+
+        model = tf.keras.models.Model(stacked_input, x)
 
         return model
 
-    def train(self, epochs=20):
+    def train(self):
         strat = tf.distribute.MirroredStrategy()
         print("GPUS AVALIBLE ", tf.config.experimental.list_physical_devices('GPU'))
 
         with strat.scope():
-            model = self.construct_model()
+            model = self.ResNet3D()
 
-            model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.001),
+            model.compile(optimizer=tf.keras.optimizers.Adagrad(),
                           loss=tf.keras.losses.MeanSquaredError(reduction="auto"),
-                          metrics=['accuracy'])
+                          metrics=[tf.keras.metrics.MeanSquaredError(), tf.keras.metrics.CosineSimilarity()])
 
         print('\nBEGINNING MODEL TRAINING')
-        model.fit(self.train_ds, epochs=epochs, validation_data=self.test_ds)
+        model.fit(self.train_ds, epochs=self.EPOCHS, validation_data=self.test_ds)
 
         print('\nBEGINNING MODEL VALIDATION')
         model.evaluate(self.test_ds)
@@ -105,6 +182,6 @@ class PositionGenerator:
 
 
 if __name__ == "__main__":
-    train_ds, test_ds = Preprocessing("/Users/micahreich/Documents/VisualEssence/data").train_test_split()
-    RG = PositionGenerator(train_ds, test_ds)
-    RG.train()
+    #train_ds, test_ds = Preprocessing("/Users/micahreich/Documents/VisualEssence/data").train_test_split()
+    RG = PositionGenerator().ResNet3D()
+    #RG.train()

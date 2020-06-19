@@ -6,7 +6,7 @@ from tensorflow.keras.utils import to_categorical
 import numpy as np
 from PIL import Image
 import os
-from random import randint, sample, random
+from random import randint, sample, random, shuffle, choice
 import math
 from IconGeneration import ConvexHull
 
@@ -22,26 +22,27 @@ class SearchPrediction:
 
         return model.predict(image_arr / 255.0)
 
-    def generate_pos_vec(self, icon_size=120):
-        position_vector = []
+    def generate_pos_vec(self, icon_size=120, n_gutters=10, difference_factor=15):
+        position_vector = np.zeros(shape=(3, 2)).astype(np.int)
+        position_vector_gutters = np.zeros(shape=(3, 2)).astype(np.int)
 
-        vec_1 = sample(range(60, 140), 2)  # (x, y)
-        position_vector.append(vec_1)
+        gutter_width = 200 / n_gutters
+        for i in range(3):
+            gutter_range_x = choice([i for i in range(2, n_gutters - 1) if i not in position_vector_gutters[:, 0]])
+            gutter_range_y = choice([i for i in range(2, n_gutters - 1) if i not in position_vector_gutters[:, 1]])
 
-        for i in range(2):
-            radius = randint(50, 140)
-            angle = random() * 6.28319  # 0 to 2pi radians
+            random_variance_x = randint(-difference_factor, difference_factor)
+            random_variance_y = randint(-difference_factor, difference_factor)
 
-            while (position_vector[i][0] + radius * math.cos(angle) + 60 > 200 or position_vector[i][
-                0] + radius * math.cos(angle) - 60 < 0) or \
-                    (position_vector[i][1] + radius * math.sin(angle) + 60 > 200 or position_vector[i][
-                        1] + radius * math.sin(angle) - 60 < 0):
-                radius = randint(50, 140)
-                angle = random() * 6.28319
+            random_gutter_coord = [
+                int((gutter_range_x * gutter_width) - (gutter_width / 2)) + random_variance_x,
+                int((gutter_range_y * gutter_width) - (gutter_width / 2)) + random_variance_y
+            ]
 
-            vec = [int(position_vector[i][0] + radius * math.cos(angle)),
-                   int(position_vector[i][1] + radius * math.sin(angle))]
-            position_vector.append(vec)
+            position_vector[i] = random_gutter_coord
+            position_vector_gutters[i] = [gutter_range_x, gutter_range_y]
+
+        position_vector = position_vector.astype(int).tolist()
 
         return position_vector
 
