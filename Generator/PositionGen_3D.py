@@ -33,7 +33,7 @@ class Preprocessing:
             stacked_images.append(np.dstack((triplet[0], triplet[1], triplet[2])))
 
         images = np.asarray(stacked_images) / 255.0
-        labels = np.asarray(pickled_labels) / 200
+        labels = np.asarray(pickled_labels) / 200.0
 
         split_point = int(0.8 * len(images))
 
@@ -58,7 +58,7 @@ class Preprocessing:
 class PositionGenerator:
     def __init__(self, train_ds, test_ds):
         self.BATCH_SIZE = 64
-        self.EPOCHS = 12
+        self.EPOCHS = 100
 
         self.train_ds = train_ds.batch(self.BATCH_SIZE)
         self.test_ds = test_ds.batch(self.BATCH_SIZE)
@@ -106,8 +106,11 @@ class PositionGenerator:
 
         return x
 
+    def stdev_regularizer(self, x):
+        return 1-tf.math.reduce_std(x)
+
     def ResNet3D(self, bn_axis=-1):
-        stacked_input = tf.keras.layers.Input(shape=(1, 224, 224, 3))
+        stacked_input = tf.keras.layers.Input(shape=(1, 200, 200, 3))
 
         # Input Conv Block
         x = tf.keras.layers.ZeroPadding3D(padding=(3, 3, 3))(stacked_input)
@@ -154,9 +157,10 @@ class PositionGenerator:
 
         # Output
         x = tf.keras.layers.GlobalAveragePooling3D()(x)
-        x = tf.keras.layers.Dense(units=6, activation='relu')(x)
+        x = tf.keras.layers.Dense(units=6, activation='relu', activity_regularizer=self.stdev_regularizer)(x)
 
         model = tf.keras.models.Model(stacked_input, x)
+        print(model.summary())
 
         return model
 
@@ -172,12 +176,16 @@ class PositionGenerator:
                           metrics=[tf.keras.metrics.MeanSquaredError(), tf.keras.metrics.CosineSimilarity()])
 
         print('\nBEGINNING MODEL TRAINING')
-        model.fit(self.train_ds, epochs=self.EPOCHS, validation_data=self.test_ds)
+        early_stop = tf.keras.callbacks.EarlyStopping('val_loss', verbose=1, patience=5, mode='min')
+        history = model.fit(self.train_ds, epochs=self.EPOCHS, validation_data=self.test_ds, callbacks=[early_stop])
+
+        hist = history.history
+        pickle.dump(hist, open("saved_pos_gen_ResNet.pkl", "wb"))
 
         print('\nBEGINNING MODEL VALIDATION')
         model.evaluate(self.test_ds)
 
-        model.save('saved_pos_gen')
+        model.save('saved_pos_gen_ResNet')
         print('\nMODEL SAVED SUCCESSFULLY!')
 
 
