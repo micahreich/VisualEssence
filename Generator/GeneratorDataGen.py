@@ -10,42 +10,44 @@ from IconGeneration import ConvexHull
 
 
 class DatasetGenerator:
-    """def __init__(self, n_samples, data_directory, run_mode, slurm_array_task_id=sys.argv[1]):
+    def __init__(self, n_samples, data_directory, run_mode, slurm_array_task_id=sys.argv[1]):
         self.n_samples = n_samples  # n_samples must be divisible by 3 * n_partitions
         self.data_directory = data_directory
-        self.n_partitions = 20
-        self.n_searches = 250
+        self.n_partitions = 1
+        self.n_searches = 230
         self.run_mode = run_mode
-        self.slurm_array_task_id = slurm_array_task_id"""
+        self.slurm_array_task_id = slurm_array_task_id
 
-    def generate_pos_vec(self, icon_size=120, n_gutters=10, difference_factor=15):
-        position_vector = np.zeros(shape=(3, 2)).astype(np.int)
-        position_vector_gutters = np.zeros(shape=(3, 2)).astype(np.int)
+        self.model = tf.keras.models.load_model(
+            data_directory[:data_directory.index("VisualEssence")] + "VisualEssence/CNN/saved_discriminator"
+        )
 
-        gutter_width = 200 / n_gutters
-        for i in range(3):
-            gutter_range_x = choice([i for i in range(2, n_gutters-1) if i not in position_vector_gutters[:,0]])
-            gutter_range_y = choice([i for i in range(2, n_gutters-1) if i not in position_vector_gutters[:,1]])
+    def generate_pos_vec(self, threshold=60):
+        position_vector = [sample(range(50, 150), 2)]
 
-            random_variance_x = randint(-difference_factor, difference_factor)
-            random_variance_y = randint(-difference_factor, difference_factor)
-
-            random_gutter_coord = [
-                int((gutter_range_x * gutter_width) - (gutter_width / 2)) + random_variance_x,
-                int((gutter_range_y * gutter_width) - (gutter_width / 2)) + random_variance_y
-            ]
-
-            position_vector[i] = random_gutter_coord
-            position_vector_gutters[i] = [gutter_range_x, gutter_range_y]
-
-        position_vector = position_vector.astype(int).tolist()
+        for i in range(2):
+            random_coord = sample(range(50, 150), 2)
+            if i == 1:
+                while self.distance(random_coord, position_vector[0]) <= threshold or \
+                        self.distance(random_coord, position_vector[1]) <= threshold:
+                    random_coord = sample(range(50, 150), 2)
+                position_vector.append(random_coord)
+            else:
+                while self.distance(random_coord, position_vector[0]) <= threshold:
+                    random_coord = sample(range(50, 150), 2)
+                position_vector.append(random_coord)
 
         return position_vector
 
     def generate_partition(self):
         files = os.listdir(self.data_directory)[:self.n_samples]
 
+        for i in files:
+           if (not i.endswith(".png")) or (not i.startswith("I")):
+               files.remove(i)
+
         file_triplets = []
+
         for i in range(0, int(len(files)/3)*3, 3):
             file_triplets.append(files[i:i + 3])
 
@@ -54,9 +56,9 @@ class DatasetGenerator:
             int(self.slurm_array_task_id)*int(len(file_triplets)/self.n_partitions) + int(len(file_triplets)/self.n_partitions)
         ]
 
-        for i in range(len(dataset_partition)):
-            for j in range(len(dataset_partition[i])):
-                dataset_partition[i][j] = self.data_directory + "/" + dataset_partition[i][j]
+        #for i in range(len(dataset_partition)):
+        #    for j in range(len(dataset_partition[i])):
+        #        dataset_partition[i][j] = self.data_directory + "/" + dataset_partition[i][j]
 
         print("GENERATED {} IMAGE FILE TRIPLETS".format(len(dataset_partition)))
 
@@ -79,11 +81,7 @@ class DatasetGenerator:
         return samples, position_vectors
 
     def highest_sample(self, arrangements):
-        model = tf.keras.models.load_model(
-            self.data_directory[:self.data_directory.index("VisualEssence")] + "VisualEssence/CNN/saved_discriminator"
-        )
-
-        softmax_scores = model.predict((np.reshape(arrangements, (-1, 200, 200, 1)) / 255.0), batch_size=50)[:, 1]
+        softmax_scores = self.model.predict((np.reshape(arrangements, (-1, 200, 200, 1)) / 255.0), batch_size=50)[:, 1]
         idx_max = np.where(softmax_scores == np.amax(softmax_scores))[0][0]
 
         return idx_max
@@ -93,8 +91,8 @@ class DatasetGenerator:
         images = []
         position_vector_labels = []
 
-        pickled_images = open((self.data_directory + '/pkl_images' + str(self.slurm_array_task_id) + '.pkl'), 'wb')
-        pickled_labels = open((self.data_directory + '/pkl_labels' + str(self.slurm_array_task_id) + '.pkl'), 'wb')
+        pickled_images = open((self.data_directory + '/pkl_images_2_' + str(self.slurm_array_task_id) + '.pkl'), 'wb')
+        pickled_labels = open((self.data_directory + '/pkl_labels_2_' + str(self.slurm_array_task_id) + '.pkl'), 'wb')
 
         for i in range(len(partitions)):
             if (i+1) % 50 == 0:
@@ -104,10 +102,11 @@ class DatasetGenerator:
             idx_max = self.highest_sample(samples)
 
             position_vector_labels.append(position_vectors[idx_max])
+            print(position_vectors[idx_max])
 
             image_triplet = []
             for j in range(len(partitions[i])):
-                image_triplet.append((255 - np.asarray(Image.open(partitions[i][j])))[:, :, 3])
+                image_triplet.append((255 - np.asarray(Image.open(self.data_directory + "/" + partitions[i][j])))[:, :, 3])
 
             images.append(image_triplet)
             tf.keras.backend.clear_session()
@@ -119,4 +118,4 @@ class DatasetGenerator:
 
 
 if __name__ == "__main__":
-    DS = DatasetGenerator().generate_pos_vec()
+    DS = DatasetGenerator(n_samples=150, data_directory="/nethome/mreich8/VisualEssence/data/generator_data", run_mode="?").generate_dataset()
