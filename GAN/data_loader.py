@@ -5,7 +5,11 @@ import requests
 from io import BytesIO
 from PIL import Image
 import pickle
+import dload
 import numpy as np
+from lxml import html
+import random
+import requests
 
 
 class DataLoader:
@@ -15,47 +19,45 @@ class DataLoader:
 
         if len(sys.argv) > 1:
             self.task_id = int(sys.argv[1])
-            self.n_partitions = 2
+            self.n_partitions = 20
 
         self.headers = {
             "Referer": "https://thenounproject.com/search/?q=technology",
             "X-Requested-With": "XMLHttpRequest",
         }
 
-    def download_image_batch(self, page_id, batch_size=100):
-        try:
-            icons_url = "https://thenounproject.com/featured/icons/?page={}&limit={}".format(page_id, batch_size)
-            icons_json = json.loads(requests.get(icons_url, headers=self.headers).text)
-            icons = []
+    def get_icon_link_and_tag(self, icon_id):
+        page = requests.get("https://thenounproject.com/browse/?i={}".format(icon_id))
+        tree = html.fromstring(page.content)
+        for meta in tree.xpath('//meta'):
+            if meta.get("property") == "og:image":
+                return meta.get("content"), tree.xpath('//title/text()')[0].split()[0].lower()
 
-            for icon in icons_json['featured_icons']:
-                icon_image = (255 - np.asarray(Image.open(BytesIO(requests.get(icon['preview_url']).content)))[:, :, 3])
-                for title in icon['tags']:
-                    if len(title['slug'].split("-")) == 1:
-                        icons.append([icon_image, title['slug']])
-                        break
-            return icons
-        except:
-            print("Error in loading page, continuing...")
+    def image_to_array(self, icon_url):
+        return 255 - np.asarray(Image.open(BytesIO(requests.get(icon_url).content)))[:, :, 3]
 
-    def download_dataset(self, info_step=5):
+    def download_image(self, icon_id):
+        icon_url, icon_name = self.get_icon_link_and_tag(icon_id)
+        return [self.image_to_array(icon_url), icon_name]
+
+    def download_dataset(self, info_step=500):
         master_list = []
         pickled_data = open((self.save_directory + '/pkl_dataset_' + str(self.task_id) + '.pkl'), 'wb')
 
-        if len(sys.argv) > 1:
-            partition_id = self.task_id*int(self.n_icons / int(self.n_partitions*100))
-            c = (self.n_icons / (self.n_partitions*100))-1
-        else:
-            partition_id = self.n_icons / 100
-            c = (self.n_icons / 100) - 1
+        random_ids = random.sample(range(0, 2000000), self.n_icons)
+        partition_length = len(random_ids) // self.n_partitions
 
-        for i in range(int(partition_id - c), partition_id+1):
-            if i % info_step == 0:
-                print("Downloaded {} icons, {}% complete".format(i*100, ((i*100)/self.n_icons)))
+        for i in range(self.task_id*partition_length, (self.task_id*partition_length) + partition_length):
+            if (i+1) % info_step == 0:
+                print("Downloaded {} icons, {}% complete".format(i+1, ((i+1) / partition_length)))
 
-            master_list += self.download_image_batch(page_id=i)
+            try:
+                master_list.extend(self.download_image(random_ids[i]))
+            except:
+                print("Error, continuing...")
 
         pickle.dump(master_list, pickled_data)
+        pickled_data.close()
 
     def collect_dataset(self):
         master_list_all = []
@@ -68,7 +70,8 @@ class DataLoader:
 
         pickle.dump(master_list_all, pickled_data)
 
+
 if __name__ == "__main__":
-    DataLoader("/nethome/mreich8/VisualEssence/data/gan_data", 500000).download_dataset()
+    DataLoader("/nethome/mreich8/VisualEssence/data/gan_data", 100).download_image(23)
 
 
