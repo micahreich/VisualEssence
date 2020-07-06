@@ -5,7 +5,6 @@ import requests
 from io import BytesIO
 from PIL import Image
 import pickle
-import dload
 import numpy as np
 from lxml import html
 import random
@@ -36,17 +35,24 @@ class DataLoader:
                 return meta.get("content"), tree.xpath('//title/text()')[0].split()[0].lower()
 
     def image_to_array(self, icon_url):
-        return 255 - np.asarray(Image.open(BytesIO(requests.get(icon_url).content)))[:, :, 3]
+        return np.reshape(
+            255 - np.asarray(Image.open(BytesIO(requests.get(icon_url).content)))[:, :, 3], (-1, 200, 200, 1)
+        )
 
     def download_image(self, icon_id):
         icon_url, icon_name = self.get_icon_link_and_tag(icon_id)
-        return [self.image_to_array(icon_url), icon_name]
+        return self.image_to_array(icon_url), icon_name
 
-    def download_dataset(self, info_step=20):
-        master_list = []
-        pickled_data = open((self.save_directory + '/pkl_dataset_' + str(self.task_id) + '.pkl'), 'wb')
+    def download_dataset(self, info_step=100):
+        try:
+            os.mkdir(path=self.save_directory + "/partition_{}".format(self.task_id))
+        except:
+            print("/partition_{} directory already exists!".format(self.task_id))
 
-        random.seed(652)
+        images = []
+        labels = []
+
+        random.seed(651)
         random_ids = random.sample(range(0, 2000000), self.n_icons)
 
         partition_length = len(random_ids) // self.n_partitions
@@ -54,27 +60,29 @@ class DataLoader:
         for i in range(self.task_id*partition_length, (self.task_id*partition_length) + partition_length):
             if (i+1) % info_step == 0:
                 print("Downloaded {} icons, {:.2f}% complete".format(i+1, ((i+1) / partition_length)*100))
-
             try:
-                master_list.extend(self.download_image(random_ids[i]))
+                image, label = self.download_image(random_ids[i])
+                images.append(np.reshape(np.asarray(image), (-1, 200, 200, 1)))
+                labels.append(label)
             except:
                 pass  # do nothing
 
-        pickle.dump(master_list, pickled_data)
-        pickled_data.close()
+        np.save(self.save_directory + "/partition_{}/images.npy".format(self.task_id), images)
+        np.save(self.save_directory + "/partition_{}/labels.npy".format(self.task_id), labels)
 
     def collect_dataset(self):
         fnames = os.listdir(self.save_directory)
         for i in fnames:
-            if not i.endswith(".pkl"):
+            if not i.endswith(".npy"):
                 fnames.remove(i)
 
-        master_list_all = []
+        images = []
+        labels = []
 
         for i in range(len(fnames)):
             print("Grabbing {}...".format(fnames[i]))
 
-            partition_data = pickle.load(open((self.save_directory + '/' + fnames[i]), 'rb'))
+            partition_data = np.load(self.save_directory + "/" + fnames[i], mmap_mode="r")
             _reshaped = np.reshape(np.asarray(partition_data), (-1, 2))
             master_list_all.extend(_reshaped)
 
@@ -109,6 +117,9 @@ class DataLoader:
             print("Could not find word vector for: {}".format(word))
             return None
 
+    def norm_image(self, image_array):
+        return (np.asarray(image_array) - 127.5) / 127.5
+
     def norm_dataset(self):
         pickled_wv = dict(pickle.load(open((self.save_directory + '/glove/glove_300d.pkl'), 'rb')))
         fnames = os.listdir(self.save_directory + '/all')
@@ -130,14 +141,22 @@ class DataLoader:
             normed_large_partition.close()
             normed_dataset = []
 
-    def get_pkl_info(self):
-        for i in os.listdir(self.save_directory + '/all'):
-            pickled_data = pickle.load(open((self.save_directory + '/all/' + i), 'rb'))
-            #print(np.asarray(np.asarray(pickled_data)[:, 0]).dtype)
-            #print(np.asarray(np.asarray(pickled_data)[:, 1]).dtype)
-
+    def get_pkl_info(self, path_to_file):
+        loaded_pkl_file = pickle.load(open((self.save_directory + path_to_file), 'rb'))
+        print("Shape of dataset array: {}".format(
+            np.asarray(loaded_pkl_file).shape)
+        )
+        print("Number of data points: {}".format(
+            len(loaded_pkl_file))
+        )
+        print("Range of values in image arrays: {}".format(
+            np.ptp(np.asarray(loaded_pkl_file)[:, 0]))
+        )
+        print("Range of values in label arrays: {}".format(
+            np.ptp(np.asarray(loaded_pkl_file)[:, 1]))
+        )
 
 if __name__ == "__main__":
-    DataLoader("/nethome/mreich8/VisualEssence/data/gan_data", 100).download_image(23)
+    DataLoader("/nethome/mreich8/VisualEssence/data/gan_data", 200000).download_image(23)
 
 
