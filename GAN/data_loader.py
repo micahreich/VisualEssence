@@ -62,7 +62,7 @@ class DataLoader:
                 print("Downloaded {} icons, {:.2f}% complete".format(i+1, ((i+1) / partition_length)*100))
             try:
                 image, label = self.download_image(random_ids[i])
-                images.append(np.reshape(np.asarray(image), (-1, 200, 200, 1)))
+                images.append(np.reshape(np.asarray(image), (200, 200, 1)))
                 labels.append(label)
             except:
                 pass  # do nothing
@@ -71,33 +71,43 @@ class DataLoader:
         np.save(self.save_directory + "/partition_{}/labels.npy".format(self.task_id), labels)
 
     def collect_dataset(self):
-        fnames = os.listdir(self.save_directory)
-        for i in fnames:
-            if not i.endswith(".npy"):
-                fnames.remove(i)
+        partition_data = os.listdir(self.save_directory)
+        glove_embeddings = dict(np.load(self.save_directory + '/glove/glove_embeddings.npy'))
 
         images = []
         labels = []
 
-        for i in range(len(fnames)):
-            print("Grabbing {}...".format(fnames[i]))
+        for i in range(len(partition_data)):
+            print("Grabbing {}...".format(partition_data[i]))
+            images_npy = np.load(self.save_directory + '/' + partition_data[i] + '/images.npy')
+            labels_npy = np.load(self.save_directory + '/' + partition_data[i] + '/labels.npy')
 
-            partition_data = np.load(self.save_directory + "/" + fnames[i], mmap_mode="r")
-            _reshaped = np.reshape(np.asarray(partition_data), (-1, 2))
-            master_list_all.extend(_reshaped)
+            for item in range(len(images_npy)):
+                images.append(
+                    np.reshape(self.norm_image(images_npy[item]), (200, 200, 1))
+                )
 
-            if (i+1) % 5 == 0:
-                print("Dumping into file {}".format(i+1))
+                labels.append(
+                    np.reshape(self.get_word_vec(labels_npy[item], glove_embeddings), (300,))
+                )
 
-                pickled_data = open((self.save_directory + '/all/pkl_datasetX_' + str(i+1) + '.pkl'), 'wb')
-                pickle.dump(master_list_all, pickled_data, pickle.HIGHEST_PROTOCOL)
-                master_list_all = []
+        print("Image array shape: {}"
+              "Label array shape: {}".format(np.asarray(images).shape, np.asarray(labels).shape))
 
-                pickled_data.close()
+        np.save(self.save_directory + '/full_dataset_images.npy', images)
+        np.save(self.save_directory + '/full_dataset_labels.npy', labels)
+
+    def get_word_vec(self, word, word_vec_dict):
+        try:
+            return word_vec_dict[word.lower()]
+        except KeyError:
+            return None
+
+    def norm_image(self, image_array):
+        return (np.asarray(image_array) - 127.5) / 127.5
 
     def collect_wordvec(self):
         embeddings_dict = {}
-        pickled_wv = open((self.save_directory + '/glove/glove_300d.pkl'), 'wb')
         path_to_glove = self.save_directory + '/glove/glove.6B.300d.txt'
 
         with open(path_to_glove, 'r') as word_vectors:
@@ -107,54 +117,11 @@ class DataLoader:
                 word_vector = np.asarray(values[1:], "float32")
                 embeddings_dict[word] = word_vector
 
-        print(len(embeddings_dict))
-        pickle.dump(embeddings_dict, pickled_wv, pickle.HIGHEST_PROTOCOL)
-
-    def get_word_vec(self, word, word_vec_dict):
-        try:
-            return word_vec_dict[word.lower()]
-        except KeyError:
-            print("Could not find word vector for: {}".format(word))
-            return None
-
-    def norm_image(self, image_array):
-        return (np.asarray(image_array) - 127.5) / 127.5
-
-    def norm_dataset(self):
-        pickled_wv = dict(pickle.load(open((self.save_directory + '/glove/glove_300d.pkl'), 'rb')))
-        fnames = os.listdir(self.save_directory + '/all')
-
-        normed_dataset = []
-
-        for i in range(len(fnames)):
-            print("Grabbing {}...".format(fnames[i]))
-            large_partition = pickle.load(open((self.save_directory + '/all/' + fnames[i]), 'rb'))
-
-            for j in range(len(large_partition)):
-                if self.get_word_vec(large_partition[j][1], pickled_wv) is not None:
-                    normed_dataset.append([
-                        np.asarray(large_partition[j][0]), np.asarray(self.get_word_vec(large_partition[j][1], pickled_wv))
-                    ])
-            normed_large_partition = open((self.save_directory + '/all_norm/pkl_dataset_' + str(i) + '.pkl'), 'wb')
-            pickle.dump(normed_dataset, normed_large_partition, pickle.HIGHEST_PROTOCOL)
-
-            normed_large_partition.close()
-            normed_dataset = []
+        np.save(self.save_directory + '/glove/glove_embeddings.npy', embeddings_dict)
 
     def get_pkl_info(self, path_to_file):
-        loaded_pkl_file = pickle.load(open((self.save_directory + path_to_file), 'rb'))
-        print("Shape of dataset array: {}".format(
-            np.asarray(loaded_pkl_file).shape)
-        )
-        print("Number of data points: {}".format(
-            len(loaded_pkl_file))
-        )
-        print("Range of values in image arrays: {}".format(
-            np.ptp(np.asarray(loaded_pkl_file)[:, 0]))
-        )
-        print("Range of values in label arrays: {}".format(
-            np.ptp(np.asarray(loaded_pkl_file)[:, 1]))
-        )
+        pass
+
 
 if __name__ == "__main__":
     DataLoader("/nethome/mreich8/VisualEssence/data/gan_data", 200000).download_image(23)
