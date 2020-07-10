@@ -50,15 +50,17 @@ class Text2Image:
     def build_generator(self):
         noise_input = Input(shape=(self.noise_input_dim,), name="Z_Input")
         text_input = Input(shape=(self.text_input_dim,), name="Text_Input")
-        init = tf.keras.initializers.RandomNormal(stddev=0.02)
 
-        text_embedding = Dense(units=128, name="Text_Embed")(text_input)
+        init_1 = tf.keras.initializers.RandomNormal(stddev=0.02)
+        init_2 = tf.keras.initializers.RandomNormal(stddev=0.02)
+
+        text_embedding = Dense(units=128, name="Text_Embed", kernel_initializer=init_1)(text_input)
         text_embedding = LeakyReLU(alpha=0.2)(text_embedding)
 
         z_concat = concatenate([noise_input, text_embedding], name="Text_Noise_Concat")
 
-        g = Dense(units=5*5*64*16, activation='relu', kernel_initializer=init)(z_concat)
-        g = Reshape(target_shape=(5, 5, 50*16))(g)
+        g = Dense(units=5*5*64*16, activation='relu', kernel_initializer=init_2)(z_concat)
+        g = Reshape(target_shape=(5, 5, 64*16))(g)
         g = BatchNormalization()(g)
         g = ReLU()(g)
 
