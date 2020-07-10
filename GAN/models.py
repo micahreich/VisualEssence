@@ -18,41 +18,46 @@ class Text2Image:
         self.image_size = 200
 
     def upconv_block(self, _input, filters, kernel_size, strides, activation=None, bn=True):
+        init = tf.keras.initializers.RandomNormal(stddev=0.02)
         g = Conv2DTranspose(filters=filters,
                             kernel_size=kernel_size,
                             strides=strides,
                             padding="same",
-                            activation=activation)(_input)
+                            activation=activation,
+                            kernel_initializer=init)(_input)
 
         if bn:
             g = BatchNormalization()(g)
-            g = ReLU()(g)
+            g = LeakyReLU(alpha=0.2)(g)
 
         return g
 
     def conv_block(self, _input, filters, kernel_size, strides, activation=None, bn=True):
+        init = tf.keras.initializers.RandomNormal(stddev=0.02)
         d = Conv2D(filters=filters,
                    kernel_size=kernel_size,
                    strides=strides,
                    padding="same",
-                   activation=activation)(_input)
+                   activation=activation,
+                   kernel_initializer=init)(_input)
 
         if bn:
             d = BatchNormalization()(d)
-            d = LeakyReLU()(d)
+            d = LeakyReLU(alpha=0.2)(d)
 
         return d
 
     def build_generator(self):
         noise_input = Input(shape=(self.noise_input_dim,), name="Z_Input")
         text_input = Input(shape=(self.text_input_dim,), name="Text_Input")
+        init = tf.keras.initializers.RandomNormal(stddev=0.02)
 
         text_embedding = Dense(units=128, name="Text_Embed")(text_input)
-        text_embedding = LeakyReLU()(text_embedding)
+        text_embedding = LeakyReLU(alpha=0.2)(text_embedding)
 
         z_concat = concatenate([noise_input, text_embedding], name="Text_Noise_Concat")
 
-        g = Dense(units=5*5*64*16, activation='relu')(z_concat)
+        g = Dense(units=5*5*64*16, activation='relu', kernel_initializer=init)(z_concat)
         g = Reshape(target_shape=(5, 5, 50*16))(g)
         g = BatchNormalization()(g)
         g = ReLU()(g)
@@ -68,6 +73,7 @@ class Text2Image:
 
     def build_discriminator(self):
         image_input = Input(shape=(200, 200, 1))
+        init = tf.keras.initializers.RandomNormal(stddev=0.02)
 
         d = self.conv_block(image_input, 64, (2, 2), (2, 2), bn=False)
         d = LeakyReLU()(d)
@@ -78,8 +84,8 @@ class Text2Image:
 
         text_input = Input(shape=(self.text_input_dim,), name="Text_Input")
 
-        text_embedding = Dense(units=128, name="Text_Embed")(text_input)
-        text_embedding = LeakyReLU()(text_embedding)
+        text_embedding = Dense(units=128, name="Text_Embed", kernel_initializer=init)(text_input)
+        text_embedding = LeakyReLU(alpha=0.2)(text_embedding)
 
         expanded_embedding = tf.keras.backend.expand_dims(text_embedding, 1)
         expanded_embedding = tf.keras.backend.expand_dims(expanded_embedding, 2)
@@ -98,14 +104,14 @@ class Text2Image:
 
         return model
 
-    def build_combined(self, generator, discriminator):
+    def build_combined(self, _generator, _discriminator):
+        _discriminator.trainable = False
+
         noise_input = Input(shape=(self.noise_input_dim,))
         text_input = Input(shape=(self.text_input_dim,))
 
-        gen_img = generator([text_input, noise_input])
-
-        discriminator.trainable = False
-        valid = discriminator([gen_img, text_input])
+        gen_img = _generator([text_input, noise_input])
+        valid = _discriminator([gen_img, text_input])
 
         model = tf.keras.Model([text_input, noise_input], valid)
 

@@ -28,40 +28,24 @@ class TrainLib:
             self.combined = models.build_combined(generator=self.generator, discriminator=self.discriminator)
 
             self.discriminator.compile(loss=tf.keras.losses.BinaryCrossentropy(),
-                                       optimizer=tf.keras.optimizers.Adam(0.0005, 0.5),
+                                       optimizer=tf.keras.optimizers.Adam(0.0002, beta_1=0.5),
                                        metrics=['accuracy'])
 
             self.combined.compile(loss=tf.keras.losses.BinaryCrossentropy(),
-                                  optimizer=tf.keras.optimizers.Adam(0.0005, 0.5),
+                                  optimizer=tf.keras.optimizers.Adam(0.0002, beta_1=0.5),
                                   metrics=['accuracy'])
 
         self.EPOCHS = 20000
-        self.BATCH_SIZE = 32
+        self.BATCH_SIZE = 144
         self.NOISE_DIM = 100
 
-        #print("Loading dataset...")
-        #self.images = np.load(data_directory + '/full_dataset_images.npy', allow_pickle=True)
-        #self.labels = np.load(data_directory + '/full_dataset_labels.npy', allow_pickle=True)
         print("Loading images...")
         self.images = np.asarray(joblib.load(data_directory + '/full_images.compressed'))
         print("Loading labels...")
         self.labels = np.asarray(joblib.load(data_directory + '/full_labels.compressed'))
-        #print(self.images.shape, self.labels.shape)
-        #self.images = np.asarray(pickle.load(open(data_directory + '/full_images.pickle', 'rb')))
-        #self.labels = np.asarray(pickle.load(open(data_directory + '/full_labels.pickle', 'rb')))
-        
-    def discriminator_loss(self, real_loss, mismatch_loss, fake_loss):
-        loss_array = [real_loss, mismatch_loss, fake_loss]
-        total_loss = 0
-
-        for i in loss_array:
-            total_loss = np.add(total_loss, i)
-
-        return 0.333 * total_loss
 
     def display_training_metrics(self, epoch, epochs, d_loss, g_loss):
         print("Epoch {}/{}".format(epoch, epochs))
-        #print(d_loss, g_loss)
         print("D loss: {:.4f}, acc: {:.4f} \nG loss: {:.4f}, acc {:.4f}".format(
             d_loss[0], 100*d_loss[1], g_loss[0], 100*g_loss[1]))
 
@@ -76,7 +60,7 @@ class TrainLib:
         sampled_text_idx = np.random.randint(0, self.labels.shape[0], nrows*ncols)
         sampled_text = self.labels[sampled_text_idx]
 
-        noise = np.random.normal(0, 1, (nrows*ncols, self.NOISE_DIM))
+        noise = self.generate_latent_points(nrows*ncols)
         generated_images = self.generator.predict([sampled_text, noise])
 
         unnorm_img = np.asarray(self.unnorm_image(generated_images[0])).astype(np.uint8)
@@ -87,6 +71,42 @@ class TrainLib:
         plt.savefig("training_samples/sample_{}.png".format(epoch), format="png")
         plt.close()
 
+    def generate_latent_points(self, batch_size):
+        x_latent = np.random.randn(batch_size * self.NOISE_DIM)
+        x_latent = np.reshape(x_latent, (batch_size, self.NOISE_DIM))
+
+        return x_latent
+
+    def generate_real_samples(self, batch_size):
+        idx = np.random.randint(0, self.images.shape[0], batch_size)
+
+        x_image = self.images[idx]  # image with right caption
+        x_text = self.labels[idx]
+        y = np.ones((batch_size, 1))
+
+        return x_image, x_text, y
+
+    def generate_fake_samples(self, batch_size):
+        idx = np.random.randint(0, self.labels.shape[0], batch_size)
+
+        x_latent = self.generate_latent_points(batch_size)  # generated image w/ right caption
+        x_text = self.labels[idx]
+
+        x_generator = self.generator.predict([x_text, x_latent])
+        y = np.zeros((batch_size, 1))
+
+        return x_generator, x_text, y
+
+    def generate_mismatch_samples(self, batch_size):
+        idx_1 = np.random.randint(0, self.images.shape[0], batch_size)
+        idx_2 = np.random.randint(0, self.labels.shape[0], batch_size)
+
+        x_image = self.images[idx_1]  # image with wrong caption
+        x_text = self.labels[idx_2]
+        y = np.zeros((batch_size, 1))
+
+        return x_image, x_text, y
+
     def train(self, sample_interval=250):
         valid = np.ones((self.BATCH_SIZE, 1))
         fake = np.zeros((self.BATCH_SIZE, 1))
@@ -96,37 +116,41 @@ class TrainLib:
 
         batches_per_epoch = int(len(self.images) / self.BATCH_SIZE)
         n_steps = batches_per_epoch * self.BATCH_SIZE
-        half_batch = int(n_steps / 2)
+        third_batch = int(n_steps / 3)
 
-        for epoch in range(n_steps):
-            #  Train Discriminator
-            real_image_text_pairs_idx = np.random.randint(0, self.images.shape[0], self.BATCH_SIZE)
-            real_images, real_text = np.reshape(self.images[real_image_text_pairs_idx], (-1, 200, 200, 1)), \
-                                     np.reshape(self.labels[real_image_text_pairs_idx], (-1, 300))
+        for i in range(n_steps):
+            # Generate real samples
+            x_image_real, x_text_real, y_real = self.generate_real_samples(third_batch)  # real samples
+            d_loss_1, d_acc_1 = self.discriminator.train_on_batch([x_image_real, x_text_real], y_real)
 
-            fake_text_idx = np.random.randint(0, self.labels.shape[0], self.BATCH_SIZE)
-            fake_text = np.reshape(self.labels[fake_text_idx], (-1, 300))
+            # Generate fake samples
+            x_image_fake, x_text_fake, y_fake = self.generate_fake_samples(third_batch)
+            d_loss_2, d_acc_2 = self.discriminator.train_on_batch([x_image_fake, x_text_fake], y_fake)
 
-            noise = np.random.normal(0, 1, (self.BATCH_SIZE, self.NOISE_DIM))
-            generated_images = self.generator.predict([fake_text, noise])
+            # Generate mismatch samples
+            x_image_mismatch, x_text_mismatch, y_mismatch = self.generate_mismatch_samples(third_batch)
+            d_loss_3, d_acc_3 = self.discriminator.train_on_batch([x_image_mismatch, x_text_mismatch], y_mismatch)
 
-            d_loss_real = self.discriminator.train_on_batch([real_images, real_text], valid)  # real image, real caption
-            d_loss_mismatched = self.discriminator.train_on_batch([real_images, fake_text], fake)  # real image, mismatched caption
-            d_loss_fake = self.discriminator.train_on_batch([generated_images, fake_text], fake)  # fake image, real caption
+            # Train combined GAN model
+            idx = np.random.randint(0, self.labels.shape[0], self.BATCH_SIZE)
 
-            d_loss = self.discriminator_loss(d_loss_real, d_loss_mismatched, d_loss_fake)
+            x_latent = self.generate_latent_points(self.BATCH_SIZE)
+            x_text = self.labels[idx]
+            y_gan = np.ones((self.BATCH_SIZE, 1))
 
-            #  Train Generator
-            sampled_text_idx = np.random.randint(0, self.labels.shape[0], self.BATCH_SIZE)
-            sampled_text = np.reshape(self.labels[sampled_text_idx], (-1, 300))
+            g_loss = self.combined.train_on_batch([x_text, x_latent], y_gan)
 
-            noise = np.random.normal(0, 1, (self.BATCH_SIZE, self.NOISE_DIM))
-            g_loss = self.combined.train_on_batch([sampled_text, noise], valid)
+            if (i+1) % 50 == 0:
+                print("batch {}:\n"
+                      "d_loss_1 (real): {},  d_loss_2 (fake): {},  d_loss_3 (mismatch): {}\n"
+                      "d_acc_1 (real): {},  d_acc_3 (fake): {},  d_acc_3 (mismatch): {}\n"
+                      "g_loss: {}\n".format(i+1,
+                                            d_loss_1, d_loss_2, d_loss_3,
+                                            int(100*d_acc_1), int(100*d_acc_2), int(100*d_acc_3),
+                                            g_loss))
 
-            if epoch % sample_interval == 0:
-                self.display_training_metrics(epoch=epoch, epochs=self.EPOCHS, d_loss=d_loss, g_loss=g_loss)
-                print("Creating generator samples...")
-                self.create_generator_samples(epoch)
+            if (i+1) % 500 == 0:
+                self.create_generator_samples(i+1)
 
         tf.keras.models.save_model(self.generator, "saved_text2icon_gan")
 
