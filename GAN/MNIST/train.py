@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 class TrainLib:
     def __init__(self):
-        self.epochs = 1000
-        self.batch_size = 64
+        self.epochs = 20000
+        self.batch_size = 32
         self.img_size = 28
         self.img_channels = 1
         self.latent_dim = 100
@@ -48,7 +48,7 @@ class TrainLib:
         return np.random.normal(0, 1, size=(batch_size, self.latent_dim))
 
     def generate_real_samples(self, batch_size):
-        idx = np.random.randint(0, self.x_train[0], batch_size)
+        idx = np.random.randint(0, self.x_train.shape[0], batch_size)
         return self.x_train[idx], self.y_train[idx]
 
     def sample_images(self, epoch):
@@ -74,7 +74,7 @@ class TrainLib:
         fig.savefig("images/%d.png" % epoch, bbox_inches='tight', dpi=200)
         plt.close()
 
-    def train(self, sample_interval=50):
+    def train(self, sample_interval=500):
         real = np.ones((self.batch_size, 1))
         fake = np.zeros((self.batch_size, 1))
 
@@ -96,5 +96,12 @@ class TrainLib:
             print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], cgan_loss))
 
             if epoch % sample_interval == 0:
-                self.sample_images()
+                self.sample_images(epoch)
+
+        self.generator.save('mnist_generator')
+
+
+if __name__ == "__main__":
+    TL = TrainLib()
+    TL.train()
 
