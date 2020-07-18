@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import *
 import numpy as np
+import random
 from models import AC_GAN
 import matplotlib.pyplot as plt
 import tensorflow.keras.backend as K
@@ -20,7 +21,7 @@ class TrainLib:
         strategy = tf.distribute.MirroredStrategy()
         with strategy.scope():
             optimizer = tf.keras.optimizers.Adam(0.0002, 0.5)
-            losses = ['binary_crossentropy', 'sparse_categorical_crossentropy']
+            losses = ['binary_crossentropy', 'categorical_crossentropy']
 
             self.discriminator = models.build_discriminator()
             self.discriminator.compile(
@@ -40,7 +41,7 @@ class TrainLib:
 
         self.x_train = (self.x_train.astype('float32') - 127.5) / 127.5
         self.x_train = np.expand_dims(self.x_train, axis=3)
-        self.y_train = self.y_train.reshape(-1, 1)
+        self.y_train = tf.keras.utils.to_categorical(self.y_train)
 
     def generate_latent_noise(self, batch_size):
         return np.random.normal(0, 1, size=(batch_size, self.latent_dim))
@@ -52,7 +53,7 @@ class TrainLib:
     def sample_images(self, epoch):
         r, c = 10, 10
         noise = np.random.normal(0, 1, (r * c, self.latent_dim))
-        sampled_labels = np.array([num for _ in range(r) for num in range(c)])
+        sampled_labels = np.asarray(random.choices(np.eye(10), k=r*c))
         gen_imgs = self.generator.predict([noise, sampled_labels])
         # Rescale images 0 - 1
         gen_imgs = 0.5 * gen_imgs + 0.5
@@ -76,7 +77,7 @@ class TrainLib:
             x_real, y_real = self.generate_real_samples(self.batch_size)
 
             noise = self.generate_latent_noise(self.batch_size)
-            sampled_labels = np.random.randint(0, 10, (self.batch_size, 1))
+            sampled_labels = np.asarray(random.choices(np.eye(10), k=self.batch_size))
 
             gen_imgs = self.generator.predict([noise, sampled_labels])
 
@@ -100,4 +101,3 @@ class TrainLib:
 if __name__ == "__main__":
     TL = TrainLib()
     TL.train()
-

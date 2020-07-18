@@ -63,7 +63,7 @@ class AC_GAN:
         model.add(Activation("tanh"))
 
         noise = Input(shape=(self.latent_dim,))
-        label = Input(shape=(1,), dtype='int32')
+        label = Input(shape=(self.num_classes,), dtype='int32')
         label_embedding = Flatten()(Embedding(self.num_classes, self.latent_dim)(label))
 
         model_input = multiply([noise, label_embedding])
@@ -73,7 +73,7 @@ class AC_GAN:
 
     def build_ac_gan(self, generator, discriminator):
         noise = Input(shape=(self.latent_dim,))
-        label = Input(shape=(1,))
+        label = Input(shape=(self.num_classes,))
 
         img = generator([noise, label])
 
