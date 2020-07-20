@@ -38,14 +38,14 @@ class AC_GAN:
 
         # Determine validity and label of the image
         validity = Dense(1, activation="sigmoid")(features)
-        label = Dense(self.num_classes, activation="softmax")(features)
+        label = Dense(self.num_classes, activation="sigmoid")(features)
 
         return tf.keras.Model(img, [validity, label])
 
     def build_generator(self):
         model = tf.keras.Sequential()
 
-        model.add(Dense(128 * 7 * 7, activation="relu", input_dim=self.latent_dim))
+        model.add(Dense(128 * 7 * 7, activation="relu", input_dim=(self.latent_dim + self.num_classes)))
         model.add(Reshape((7, 7, 128)))
         model.add(BatchNormalization(momentum=0.8))
 
@@ -63,10 +63,10 @@ class AC_GAN:
         model.add(Activation("tanh"))
 
         noise = Input(shape=(self.latent_dim,))
-        label = Input(shape=(self.num_classes,), dtype='int32')
-        label_embedding = Flatten()(Embedding(self.num_classes, self.latent_dim)(label))
+        label = Input(shape=(self.num_classes,))
+        #label_embedding = Flatten()(Embedding(self.num_classes, self.latent_dim)(label))
 
-        model_input = multiply([noise, label_embedding])
+        model_input = concatenate([noise, label], axis=1)
         img = model(model_input)
 
         return tf.keras.Model([noise, label], img)
