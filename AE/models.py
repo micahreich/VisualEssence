@@ -75,4 +75,5 @@ class I2I_AE:
         composed_image = encoder_net(stacked_input)
         reconstructed_image = decoder_net(composed_image)
 
-        return tf.keras.Model(inputs=composed_image, outputs=reconstructed_image)
+        return tf.keras.Model(inputs=stacked_input, outputs=reconstructed_image)
+
