@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 from tensorflow.keras.layers import *
 
 
@@ -45,6 +46,24 @@ class EvalLib:
         fig.subplots_adjust(hspace=0.8)
         fig.savefig("samples.png")
         plt.close()
+
+    def plot_training_history(self):
+        history = pickle.load(open('training_history.pkl', 'rb'))
+        d_loss_real = np.asarrat(history['d_loss_real'])
+        d_loss_fake = np.asarrat(history['d_loss_fake'])
+
+        d_loss = 0.5 * np.add(d_loss_real[:, 0], d_loss_fake[:, 0])
+        g_loss = np.asarrat(history['g_loss'])
+
+        plt.plot(d_loss, len(d_loss))
+        plt.plot(g_loss, len(g_loss))
+
+        plt.ylabel('Training Loss')
+        plt.xlabel('Epoch')
+
+        plt.savefig('training_loss.png')
+        plt.close()
+
 
 if __name__ == "__main__":
     EL = EvalLib('ac_gan_mnist/')
