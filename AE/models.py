@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import *
 import tensorflow_addons as tfa
+import tensorflow.keras.backend as K
 
 
 class I2I_AE:
@@ -12,14 +13,18 @@ class I2I_AE:
         self.img_shape = (self.img_size, self.img_size, self.img_channels)
 
     def build_encoder(self):
+        init = tf.keras.initializers.RandomNormal(stddev=0.02)
+
         def conv2d(layer_input, filters, kernel_size, strides, activation='relu'):
-            x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same")(layer_input)
+            x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides,
+                       padding="same", kernel_initializer=init)(layer_input)
             x = BatchNormalization(momentum=0.8)(x)
             x = Activation(activation)(x)
             return x
 
         def upconv2d(layer_input, filters, kernel_size, strides, activation='relu'):
-            x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, padding="same")(layer_input)
+            x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides,
+                                padding="same", kernel_initializer=init)(layer_input)
             x = BatchNormalization(momentum=0.8)(x)
             x = Activation(activation)(x)
             return x
@@ -36,19 +41,29 @@ class I2I_AE:
         decoder = upconv2d(decoder, 512, 3, 1)
         decoder = upconv2d(decoder, 256, 3, 1)
         decoder = upconv2d(decoder, 128, 3, 2)
-        encoder_out = upconv2d(decoder, 1, 3, 2, activation='sigmoid')
+
+        def bimodal_regularizer(out):
+            return 0.5 - (K.mean(K.abs(out - 0.5)))
+
+        encoder_out = Conv2DTranspose(filters=1, kernel_size=3, strides=2, padding="same")(decoder)
+        encoder_out = BatchNormalization(momentum=0.8)(encoder_out)
+        encoder_out = Activation('sigmoid', activity_regularizer=bimodal_regularizer)(encoder_out)
 
         return tf.keras.Model(inputs=stacked_input, outputs=encoder_out)
 
     def build_decoder(self):
+        init = tf.keras.initializers.RandomNormal(stddev=0.02)
+
         def conv2d(layer_input, filters, kernel_size, strides, activation='relu'):
-            x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same")(layer_input)
+            x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides,
+                       padding="same", kernel_initializer=init)(layer_input)
             x = BatchNormalization(momentum=0.8)(x)
             x = Activation(activation)(x)
             return x
 
         def upconv2d(layer_input, filters, kernel_size, strides, activation='relu'):
-            x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, padding="same")(layer_input)
+            x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides,
+                                padding="same", kernel_initializer=init)(layer_input)
             x = BatchNormalization(momentum=0.8)(x)
             x = Activation(activation)(x)
             return x
@@ -65,7 +80,13 @@ class I2I_AE:
         decoder = upconv2d(decoder, 512, 3, 1)
         decoder = upconv2d(decoder, 256, 3, 1)
         decoder = upconv2d(decoder, 128, 3, 2)
-        decoder_out = upconv2d(decoder, 2, 3, 2, activation='sigmoid')
+
+        def bimodal_regularizer(out):
+            return 0.5 - (K.mean(K.abs(out - 0.5)))
+
+        decoder_out = Conv2DTranspose(filters=2, kernel_size=3, strides=2, padding="same")(decoder)
+        decoder_out = BatchNormalization(momentum=0.8)(decoder_out)
+        decoder_out = Activation('sigmoid', activity_regularizer=bimodal_regularizer)(decoder_out)
 
         return tf.keras.Model(inputs=composed_image, outputs=decoder_out)
 
