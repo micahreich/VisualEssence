@@ -5,6 +5,7 @@ import random
 from models import I2I_AE
 import matplotlib.pyplot as plt
 import tensorflow.keras.backend as K
+import pickle
 
 
 class TrainLib:
@@ -24,19 +25,15 @@ class TrainLib:
 
             self.autoencoder = models.build_autoencoder(encoder_net=self.encoder, decoder_net=self.decoder)
             self.autoencoder.compile(
-                loss=tf.keras.losses.BinaryCrossentropy(),
-                optimizer=tf.keras.optimizers.Adam(),
-                metrics=[tf.keras.metrics.MeanSquaredError()])
+                loss=tf.keras.losses.MeanSquaredError(),
+                optimizer=tf.keras.optimizers.Adam(0.0002),
+                metrics=[tf.keras.metrics.CosineSimilarity()])
 
         print("Loading MNIST dataset...")
         (self.x_train, self.y_train), (self.x_test, self.y_test) = tf.keras.datasets.mnist.load_data()
 
-        #self.images = np.concatenate((self.x_train, self.x_test), axis=0)
-        #self.labels =  np.concatenate((self.y_train, self.y_test), axis=0)
-
-        self.images = self.x_train.astype('float32') / 255.0
+        self.images = tf.keras.backend.resize_images(self.x_train.astype('float32'), 32, 23)
         self.labels = self.y_train.astype('int32')
-        #self.images = np.expand_dims(self.x_train, axis=3)
 
         print("Training Dataset: " + str(self.images.shape))
 
@@ -65,16 +62,24 @@ class TrainLib:
         plt.close()
   
     def train(self, sample_interval=200):
+        loss_history = []
+
         for epoch in range(self.epochs):
             stacked_input, _ = self.generate_samples(self.batch_size)
             ae_loss, accuracy = self.autoencoder.train_on_batch(x=stacked_input, y=stacked_input)
-    
+
+            loss_history.append(ae_loss)
+
             if epoch % 20 == 0:
-                print("Epoch {} [loss: {:.4f}, acc: {:.4f}]".format(epoch, ae_loss, accuracy))
+                print("Epoch {} [loss: {:.4f}, acc: {:.4f}]".format(epoch, ae_loss, 100*accuracy))
 
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
 
+        print("Saving Training History...")
+        pickle.dump(loss_history, open("loss_hist", "wb"))
+
+        print("Saving Model...")
         self.encoder.save('mnist_ae')
 
 
