@@ -9,25 +9,31 @@ class ImagePaste(tf.keras.layers.Layer):
         super(ImagePaste, self).__init__(**kwargs)
         self.canvas_size = 72
 
+    def build(self, input_shape):
+        self.batch_s = input_shape[0]
+
+        super(ImagePaste, self).build(input_shape)
+    
     def call(self, input_data, t_val=255):
         positions = tf.convert_to_tensor(input_data)
         positions = tf.reshape(positions, [-1, 2, 2])
 
-        batch_size = positions.shape[0]
-
-        canvas = tf.Variable(np.ones(shape=(batch_size, 72, 72, 3)) * t_val,
+        canvas = tf.Variable(tf.ones([self.batch_s, 72, 72, 3]) * t_val,
                              dtype=tf.float32,
-                             trainable=False)
+                             trainable=False, validate_shape=True)
 
-        for i in range(batch_size):
+        for i in tf.range(0, self.batch_s):
             color = tf.convert_to_tensor(np.eye(3)[np.random.choice(3)] * 250, dtype=tf.float32)
             tl, br = tf.cast(positions[i], dtype=tf.int64)
 
-            for r in range(min(tl[0], self.canvas_size), min(br[0], self.canvas_size)):
-                for c in range(min(tl[1], self.canvas_size), min(br[1], self.canvas_size)):
+            for r in tf.range(min(tl[0], self.canvas_size), min(br[0], self.canvas_size)):
+                for c in tf.range(min(tl[1], self.canvas_size), min(br[1], self.canvas_size)):
                     canvas[i, r, c, :].assign(color)
 
-        return canvas
+        return tf.convert_to_tensor(canvas)
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], self.canvas_size, self.canvas_size, 3)
 
 
 class ModelLib:
@@ -37,7 +43,7 @@ class ModelLib:
         self.n_coords = 6
 
     def build_composer(self):
-        latent_input = Input(shape=100)
+        latent_input = Input(shape=100, batch_size=64)
 
         p = Dense(units=128)(latent_input)
         p = Dense(units=256)(p)
@@ -47,7 +53,7 @@ class ModelLib:
         out = Dropout(0.4)(p)
         out = Dense(units=4, activation='relu')(out)  # TOP LEFT, BOTTOM RIGHT COORDINATE
 
-        composed_image = ImagePaste(trainable=False)(out)
+        composed_image = ImagePaste(trainable=False, dynamic=True)(out)
 
         return tf.keras.Model(inputs=latent_input, outputs=composed_image)
 
@@ -72,11 +78,12 @@ class ModelLib:
         return tf.keras.Model(inputs=image_input, outputs=valid)
 
     def build_full_model(self, composer, discriminator):
-        stacked_input = Input(shape=(72, 72, 3))
+        latent_input = Input(shape=100, batch_size=64)
 
-        composed_image = composer(stacked_input)
+        composed_image = composer(latent_input)
 
         discriminator.trainable = False
         valid = discriminator(composed_image)
 
-        return tf.keras.Model(inputs=stacked_input, outputs=valid)
+        return tf.keras.Model(inputs=latent_input, outputs=valid)
+

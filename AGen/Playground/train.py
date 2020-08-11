@@ -18,21 +18,20 @@ class TrainLib:
         models = ModelLib()
 
         strategy = tf.distribute.MirroredStrategy()
-        with strategy.scope():
-            optimizer = tf.keras.optimizers.Adam(0.0002, 0.5)
+        optimizer = tf.keras.optimizers.Adam(0.0002, 0.5)
 
-            self.discriminator = models.build_discriminator()
-            self.discriminator.compile(
-                loss='binary_crossentropy',
-                optimizer=optimizer,
-                metrics=['accuracy'])
+        self.discriminator = models.build_discriminator()
+        self.discriminator.compile(
+            loss='binary_crossentropy',
+            optimizer=optimizer,
+            metrics=['accuracy'])
 
-            self.composer = models.build_composer()
+        self.composer = models.build_composer()
 
-            self.gan = models.build_full_model(composer=self.composer, discriminator=self.discriminator)
-            self.gan.compile(
-                loss='binary_crossentropy',
-                optimizer=optimizer)
+        self.gan = models.build_full_model(composer=self.composer, discriminator=self.discriminator)
+        self.gan.compile(
+            loss='binary_crossentropy',
+            optimizer=optimizer)
 
         print("Loading Squares dataset...")
         self.x_train = np.load("data/squares.npy", allow_pickle=True)
@@ -72,7 +71,7 @@ class TrainLib:
             x_real = self.generate_real_samples(self.batch_size)
             noise = self.generate_latent_noise(self.batch_size)
 
-            gen_imgs = self.composer.predict(noise)
+            gen_imgs = self.composer.predict(noise, batch_size=self.batch_size)
 
             d_loss_real = self.discriminator.train_on_batch(x_real, valid)
             d_loss_fake = self.discriminator.train_on_batch(gen_imgs, fake)
