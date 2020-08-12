@@ -4,46 +4,14 @@ import tensorflow.keras.backend as K
 import numpy as np
 
 
-class ImagePaste(tf.keras.layers.Layer):
-    def __init__(self,  **kwargs):
-        super(ImagePaste, self).__init__(**kwargs)
-        self.canvas_size = 72
-
-    def build(self, input_shape):
-        self.batch_s = input_shape[0]
-
-        super(ImagePaste, self).build(input_shape)
-    
-    def call(self, input_data, t_val=255):
-        positions = tf.convert_to_tensor(input_data)
-        positions = tf.reshape(positions, [-1, 2, 2])
-
-        canvas = tf.Variable(tf.ones([self.batch_s, 72, 72, 3]) * t_val,
-                             dtype=tf.float32,
-                             trainable=False, validate_shape=True)
-
-        for i in tf.range(0, self.batch_s):
-            color = tf.convert_to_tensor(np.eye(3)[np.random.choice(3)] * 250, dtype=tf.float32)
-            tl, br = tf.cast(positions[i], dtype=tf.int64)
-
-            for r in tf.range(min(tl[0], self.canvas_size), min(br[0], self.canvas_size)):
-                for c in tf.range(min(tl[1], self.canvas_size), min(br[1], self.canvas_size)):
-                    canvas[i, r, c, :].assign(color)
-
-        return tf.convert_to_tensor(canvas)
-
-    def compute_output_shape(self, input_shape):
-        return (input_shape[0], self.canvas_size, self.canvas_size, 3)
-
-
 class ModelLib:
     def __init__(self):
         self.image_shape = (72, 72, 4)
-        self.img_size = 72
-        self.n_coords = 6
+        self.canvas_size = 72
+        self.n_coords = 4
 
     def build_composer(self):
-        latent_input = Input(shape=100, batch_size=64)
+        latent_input = Input(shape=100)
 
         p = Dense(units=128)(latent_input)
         p = Dense(units=256)(p)
@@ -53,7 +21,21 @@ class ModelLib:
         out = Dropout(0.4)(p)
         out = Dense(units=4, activation='relu')(out)  # TOP LEFT, BOTTOM RIGHT COORDINATE
 
-        composed_image = ImagePaste(trainable=False, dynamic=True)(out)
+        def image_paste(x):
+            positions = tf.cast(tf.reshape(x, (2, 2)), tf.int32)
+            w, h = positions[1, 0] - positions[0, 0], positions[1, 1] - positions[0, 1]
+
+            shape = tf.zeros(shape=(h, w, 3)) + (tf.eye(3)[tf.random.uniform([], 0, 3, dtype=tf.int64)] * 250)
+
+            padding = [[positions[0, 1], self.canvas_size - positions[1, 1]],
+                       [positions[0, 0], self.canvas_size - positions[1, 0]],
+                       [0, 0]]
+            return tf.pad(shape, padding, mode="CONSTANT", constant_values=255)
+
+        def tf_map_fn(x):
+            return tf.nest.map_structure(tf.stop_gradient, tf.map_fn(fn=image_paste, elems=x))
+
+        composed_image = Lambda(tf_map_fn, name="composition_layer", output_shape=(None, 72, 72, 3))(out)
 
         return tf.keras.Model(inputs=latent_input, outputs=composed_image)
 
@@ -87,3 +69,5 @@ class ModelLib:
 
         return tf.keras.Model(inputs=latent_input, outputs=valid)
 
+
+ModelLib().build_composer()
