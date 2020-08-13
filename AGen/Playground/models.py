@@ -19,23 +19,34 @@ class ModelLib:
         p = Dense(units=1024)(p)
 
         out = Dropout(0.4)(p)
-        out = Dense(units=4, activation='relu')(out)  # TOP LEFT, BOTTOM RIGHT COORDINATE
+        out = Dense(units=4)(out)  # TOP LEFT, BOTTOM RIGHT COORDINATE
+        out = ReLU(max_value=self.canvas_size)(out)
 
         def image_paste(x):
             positions = tf.cast(tf.reshape(x, (2, 2)), tf.int32)
-            w, h = positions[1, 0] - positions[0, 0], positions[1, 1] - positions[0, 1]
+
+            w = tf.cast(positions[1, 0] - positions[0, 0], tf.int32) if positions[1, 0] > positions[0, 0] else 0
+            h = tf.cast(positions[1, 1] - positions[0, 1], tf.int32) if positions[1, 1] > positions[0, 1] else 0
 
             shape = tf.zeros(shape=(h, w, 3)) + (tf.eye(3)[tf.random.uniform([], 0, 3, dtype=tf.int64)] * 250)
 
-            padding = [[positions[0, 1], self.canvas_size - positions[1, 1]],
-                       [positions[0, 0], self.canvas_size - positions[1, 0]],
+            top_pad = positions[0, 1] if positions[0, 1] < positions[1, 1] else 0
+            bottom_pad = self.canvas_size - positions[1, 1] if positions[0, 1] < positions[1, 1] else self.canvas_size
+            left_pad = positions[0, 0] if positions[0, 0] < positions[1, 0] else 0
+            right_pad = self.canvas_size - positions[1, 0] if positions[0, 0] < positions[1, 0] else self.canvas_size
+
+            padding = [[top_pad, bottom_pad],
+                       [left_pad, right_pad],
                        [0, 0]]
-            return tf.pad(shape, padding, mode="CONSTANT", constant_values=255)
+
+            s = tf.pad(shape, padding, mode="CONSTANT", constant_values=255)
+            print(s.shape)
+            return s
 
         def tf_map_fn(x):
             return tf.nest.map_structure(tf.stop_gradient, tf.map_fn(fn=image_paste, elems=x))
 
-        composed_image = Lambda(tf_map_fn, name="composition_layer", output_shape=(None, 72, 72, 3))(out)
+        composed_image = Lambda(tf_map_fn, name="composition_layer")(out)
 
         return tf.keras.Model(inputs=latent_input, outputs=composed_image)
 
@@ -68,6 +79,3 @@ class ModelLib:
         valid = discriminator(composed_image)
 
         return tf.keras.Model(inputs=latent_input, outputs=valid)
-
-
-ModelLib().build_composer()
