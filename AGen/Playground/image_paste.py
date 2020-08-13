@@ -5,18 +5,52 @@ import tensorflow as tf
 canvas_size = 72
 
 
-def square_paste(positions):
-    positions = tf.reshape(tf.convert_to_tensor(positions), (2, 2))
-    w, h = positions[1, 0] - positions[0, 0], positions[1, 1] - positions[0, 1]
+def image_paste(x):
+    positions = tf.cast(tf.reshape(x, (2, 2)), tf.int32)
 
-    shape = tf.zeros(shape=(h, w, 3)) + (tf.eye(3)[tf.random.uniform(shape=[], minval=0, maxval=3, dtype=tf.int64)] * 250)
+    zero_default = lambda: 0
+    canvas_default = lambda: canvas_size
 
-    padding = [[positions[0, 1], canvas_size - positions[1, 1]],
-               [positions[0, 0], tf.constant(canvas_size) - positions[1, 0]],
+    width_fn = lambda: tf.cast(positions[1, 0] - positions[0, 0], tf.int32)
+    w = tf.case(
+        [(tf.greater(positions[1, 0], positions[0, 0]), width_fn)],
+        default=zero_default)
+
+    height_fn = lambda: tf.cast(positions[1, 1] - positions[0, 1], tf.int32)
+    h = tf.case(
+        [(tf.greater(positions[1, 1], positions[0, 1]), height_fn)],
+        default=zero_default)
+
+    shape = tf.zeros(shape=(h, w, 3)) + (tf.eye(3)[tf.random.uniform([], 0, 3, dtype=tf.int64)] * 250)
+
+    top_pad_fn = lambda: positions[0, 1]
+    top_pad = tf.case(
+        [(tf.less(positions[0, 1], positions[1, 1]), top_pad_fn)],
+        default=zero_default)
+
+    bottom_pad_fn = lambda: canvas_size - positions[1, 1]
+    bottom_pad = tf.case(
+        [(tf.less(positions[0, 1], positions[1, 1]), bottom_pad_fn)],
+        default=canvas_default)
+
+    left_pad_fn = lambda: positions[0, 0]
+    left_pad = tf.case(
+        [(tf.less(positions[0, 0], positions[1, 0]), left_pad_fn)],
+        default=zero_default)
+
+    right_pad_fn = lambda: canvas_size - positions[1, 0]
+    right_pad = tf.case(
+        [(tf.less(positions[0, 0], positions[1, 0]), right_pad_fn)],
+        default=canvas_default)
+
+    padding = [[top_pad, bottom_pad],
+               [left_pad, right_pad],
                [0, 0]]
 
-    return tf.pad(shape, padding, mode="CONSTANT", constant_values=255)
+    s = tf.pad(shape, padding, mode="CONSTANT", constant_values=255)
+    print(s.shape)
+    return s
 
 
-c = square_paste([(5, 8), (20, 60)])
+c = image_paste(tf.constant([2, 0, 23, 7]))
 Image.fromarray(np.asarray(c).astype("uint8")).show()

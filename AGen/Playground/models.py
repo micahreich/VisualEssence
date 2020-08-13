@@ -23,18 +23,49 @@ class ModelLib:
         out = ReLU(max_value=self.canvas_size)(out)
 
         def image_paste(x):
+            # Position reshaping
             positions = tf.cast(tf.reshape(x, (2, 2)), tf.int32)
 
-            w = tf.cast(positions[1, 0] - positions[0, 0], tf.int32) if positions[1, 0] > positions[0, 0] else 0
-            h = tf.cast(positions[1, 1] - positions[0, 1], tf.int32) if positions[1, 1] > positions[0, 1] else 0
+            # Default tf.case lambda functions
+            zero_default = lambda: 0
+            canvas_default = lambda: self.canvas_size
 
+            # Shape width and height
+            width_fn = lambda: tf.cast(positions[1, 0] - positions[0, 0], tf.int32)
+            w = tf.case(
+                [(tf.greater(positions[1, 0], positions[0, 0]), width_fn)],
+                default=zero_default)
+
+            height_fn = lambda: tf.cast(positions[1, 1] - positions[0, 1], tf.int32)
+            h = tf.case(
+                [(tf.greater(positions[1, 1], positions[0, 1]), height_fn)],
+                default=zero_default)
+
+            # Shape creation
             shape = tf.zeros(shape=(h, w, 3)) + (tf.eye(3)[tf.random.uniform([], 0, 3, dtype=tf.int64)] * 250)
 
-            top_pad = positions[0, 1] if positions[0, 1] < positions[1, 1] else 0
-            bottom_pad = self.canvas_size - positions[1, 1] if positions[0, 1] < positions[1, 1] else self.canvas_size
-            left_pad = positions[0, 0] if positions[0, 0] < positions[1, 0] else 0
-            right_pad = self.canvas_size - positions[1, 0] if positions[0, 0] < positions[1, 0] else self.canvas_size
+            # Assigning padding, checking for valid coordinates
+            top_pad_fn = lambda: positions[0, 1]
+            top_pad = tf.case(
+                [(tf.less(positions[0, 1], positions[1, 1]), top_pad_fn)],
+                default=zero_default)
 
+            bottom_pad_fn = lambda: self.canvas_size - positions[1, 1]
+            bottom_pad = tf.case(
+                [(tf.less(positions[0, 1], positions[1, 1]), bottom_pad_fn)],
+                default=canvas_default)
+
+            left_pad_fn = lambda: positions[0, 0]
+            left_pad = tf.case(
+                [(tf.less(positions[0, 0], positions[1, 0]), left_pad_fn)],
+                default=zero_default)
+
+            right_pad_fn = lambda: self.canvas_size - positions[1, 0]
+            right_pad = tf.case(
+                [(tf.less(positions[0, 0], positions[1, 0]), right_pad_fn)],
+                default=canvas_default)
+
+            # Create padding tensor
             padding = [[top_pad, bottom_pad],
                        [left_pad, right_pad],
                        [0, 0]]

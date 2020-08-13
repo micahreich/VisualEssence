@@ -18,20 +18,21 @@ class TrainLib:
         models = ModelLib()
 
         strategy = tf.distribute.MirroredStrategy()
-        optimizer = tf.keras.optimizers.Adam(0.0002, 0.5)
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.Adam(0.0002, 0.5)
 
-        self.discriminator = models.build_discriminator()
-        self.discriminator.compile(
-            loss='binary_crossentropy',
-            optimizer=optimizer,
-            metrics=['accuracy'])
+            self.discriminator = models.build_discriminator()
+            self.discriminator.compile(
+                loss='binary_crossentropy',
+                optimizer=optimizer,
+                metrics=['accuracy'])
 
-        self.composer = models.build_composer()
+            self.composer = models.build_composer()
 
-        self.gan = models.build_full_model(composer=self.composer, discriminator=self.discriminator)
-        self.gan.compile(
-            loss='binary_crossentropy',
-            optimizer=optimizer)
+            self.gan = models.build_full_model(composer=self.composer, discriminator=self.discriminator)
+            self.gan.compile(
+                loss='binary_crossentropy',
+                optimizer=optimizer)
 
         print("Loading Squares dataset...")
         self.x_train = np.load("data/squares.npy", allow_pickle=True)
