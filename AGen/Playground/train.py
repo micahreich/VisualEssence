@@ -19,7 +19,7 @@ class TrainLib:
 
         strategy = tf.distribute.MirroredStrategy()
         with strategy.scope():
-            optimizer = tf.keras.optimizers.Adam(0.0002, 0.5)
+            optimizer = tf.keras.optimizers.Adam(0.0003, 0.5)
 
             self.discriminator = models.build_discriminator()
             self.discriminator.compile(
