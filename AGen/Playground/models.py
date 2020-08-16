@@ -26,8 +26,8 @@ class ModelLib:
 
         def image_paste(x):
             # Position reshaping
-            x_h = tf.math.add(x, tf.constant([0, 0, 20, 20], dtype=tf.float32))
-            positions = tf.cast(tf.reshape(x_h, (2, 2)), tf.int32)
+            #x_h = tf.math.add(x, tf.constant([0, 0, 20, 20], dtype=tf.float32))
+            positions = tf.cast(tf.reshape(x, (2, 2)), tf.int32)
 
             # Default tf.case lambda functions
 

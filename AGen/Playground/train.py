@@ -21,7 +21,7 @@ class TrainLib:
         with strategy.scope():
             optimizer = tf.keras.optimizers.Adam(0.0003, 0.5)
 
-            self.discriminator = models.build_discriminator()
+            """self.discriminator = models.build_discriminator()
             self.discriminator.compile(
                 loss=tf.keras.losses.BinaryCrossentropy(label_smoothing=0.4),
                 optimizer=optimizer,
@@ -32,7 +32,12 @@ class TrainLib:
             self.gan = models.build_full_model(composer=self.composer, discriminator=self.discriminator)
             self.gan.compile(
                 loss=tf.keras.losses.BinaryCrossentropy(),
-                optimizer=optimizer)
+                optimizer=optimizer)"""
+            self.composer = models.build_composer()
+            self.composer.compile(
+                loss=tf.keras.losses.MSE(),
+                optimizer=optimizer
+            )
 
         print("Loading Squares dataset...")
         self.x_train = np.load("data/squares.npy", allow_pickle=True)
@@ -45,12 +50,6 @@ class TrainLib:
     def generate_real_samples(self, batch_size):
         idx = np.random.randint(0, self.x_train.shape[0], batch_size)
         return self.x_train[idx]
-
-    def noisy_labels(self, y, p_flip):
-        n_select = int(p_flip * y.shape[0])
-        flip_ix = np.random.choice([i for i in range(y.shape[0])], size=n_select)
-        y[flip_ix] = 1 - y[flip_ix]
-        return y
 
     def sample_images(self, epoch):
         r, c = 4, 4
@@ -70,7 +69,7 @@ class TrainLib:
         plt.close()
 
     def train(self, sample_interval=100):
-        valid = np.ones((self.batch_size, 1))
+        """valid = np.ones((self.batch_size, 1))
         fake = np.zeros((self.batch_size, 1))
 
         for epoch in range(self.epochs):
@@ -89,6 +88,18 @@ class TrainLib:
             g_loss = self.gan.train_on_batch(noise, valid)
 
             print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss))
+
+            if epoch % sample_interval == 0:
+                self.sample_images(epoch)
+
+        self.composer.save('square_gen')"""
+
+        for epoch in range(self.epochs):
+            x_real = self.generate_real_samples(self.batch_size)
+            noise = self.generate_latent_noise(self.batch_size)
+
+            g_loss = self.composer.train_on_batch(noise, x_real)
+            print("%d [G loss: %f]" % (epoch,  g_loss))
 
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
