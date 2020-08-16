@@ -11,20 +11,23 @@ class ModelLib:
         self.n_coords = 4
 
     def build_composer(self):
+        def l1_reg_inv(x, l1=0.001):
+            return -l1 * tf.reduce_sum(tf.abs(x))
+
         latent_input = Input(shape=100)
 
-        p = Dense(units=128)(latent_input)
-        p = Dense(units=256)(p)
-        p = Dense(units=512)(p)
-        p = Dense(units=1024)(p)
+        p = Dense(units=128, kernel_initializer='random_normal')(latent_input)
+        p = Dense(units=256, kernel_initializer='random_normal')(p)
+        p = Dense(units=512, kernel_initializer='random_normal')(p)
+        p = Dense(units=1024, kernel_initializer='random_normal')(p)
 
-        out = Dropout(0.4)(p)
-        out = Dense(units=4)(out)  # TOP LEFT, BOTTOM RIGHT COORDINATE
+        out = Dense(units=4)(p)  # TOP LEFT, BOTTOM RIGHT COORDINATE
         out = ReLU(max_value=self.canvas_size)(out)
 
         def image_paste(x):
             # Position reshaping
-            positions = tf.cast(tf.reshape(x, (2, 2)), tf.int32)
+            x_h = tf.math.add(x, tf.constant([0, 0, 20, 20], dtype=tf.float32))
+            positions = tf.cast(tf.reshape(x_h, (2, 2)), tf.int32)
 
             # Default tf.case lambda functions
 
@@ -38,7 +41,7 @@ class ModelLib:
                 lambda: tf.raw_ops.Cast(x=positions[1, 1] - positions[0, 1], DstT=tf.int32), lambda: 0)
 
             # Shape creation
-            shape = tf.zeros(shape=(h, w, 3)) + (tf.eye(3)[tf.random.uniform([], 0, 3, dtype=tf.int64)] * 250)
+            shape = tf.zeros(shape=(h, w, 3))
 
             # Assigning padding, checking for valid coordinates
             top_pad = tf.cond(
@@ -68,7 +71,7 @@ class ModelLib:
         def tf_map_fn(x):
             return tf.map_fn(fn=image_paste, elems=x)
 
-        composed_image = Lambda(tf_map_fn, name="composition_layer")(out)
+        composed_image = Lambda(tf_map_fn, name="composition_layer", trainable=False)(out)
 
         return tf.keras.Model(inputs=latent_input, outputs=composed_image)
 
@@ -82,9 +85,6 @@ class ModelLib:
 
         d = conv2d(image_input, filters=64, kernel_size=3, strides=2)
         d = conv2d(d, filters=128, kernel_size=3, strides=2)
-        d = conv2d(d, filters=256, kernel_size=3, strides=2)
-        d = conv2d(d, filters=512, kernel_size=3, strides=2)
-        d = conv2d(d, filters=512, kernel_size=3, strides=1)
 
         d = Flatten()(d)
 
@@ -93,7 +93,7 @@ class ModelLib:
         return tf.keras.Model(inputs=image_input, outputs=valid)
 
     def build_full_model(self, composer, discriminator):
-        latent_input = Input(shape=100, batch_size=64)
+        latent_input = Input(shape=100)
 
         composed_image = composer(latent_input)
 

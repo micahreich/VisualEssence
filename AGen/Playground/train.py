@@ -23,7 +23,7 @@ class TrainLib:
 
             self.discriminator = models.build_discriminator()
             self.discriminator.compile(
-                loss='binary_crossentropy',
+                loss=tf.keras.losses.BinaryCrossentropy(label_smoothing=0.4),
                 optimizer=optimizer,
                 metrics=['accuracy'])
 
@@ -31,7 +31,7 @@ class TrainLib:
 
             self.gan = models.build_full_model(composer=self.composer, discriminator=self.discriminator)
             self.gan.compile(
-                loss='binary_crossentropy',
+                loss=tf.keras.losses.BinaryCrossentropy(),
                 optimizer=optimizer)
 
         print("Loading Squares dataset...")
@@ -40,11 +40,17 @@ class TrainLib:
         print(self.x_train.shape)
 
     def generate_latent_noise(self, batch_size):
-        return np.random.normal(0, 1, size=(batch_size, self.latent_dim))
+        return np.random.randn(batch_size * self.latent_dim).reshape((batch_size, self.latent_dim))
 
     def generate_real_samples(self, batch_size):
         idx = np.random.randint(0, self.x_train.shape[0], batch_size)
         return self.x_train[idx]
+
+    def noisy_labels(self, y, p_flip):
+        n_select = int(p_flip * y.shape[0])
+        flip_ix = np.random.choice([i for i in range(y.shape[0])], size=n_select)
+        y[flip_ix] = 1 - y[flip_ix]
+        return y
 
     def sample_images(self, epoch):
         r, c = 4, 4
@@ -63,7 +69,7 @@ class TrainLib:
         fig.savefig("images/%d.png" % epoch)
         plt.close()
 
-    def train(self, sample_interval=250):
+    def train(self, sample_interval=100):
         valid = np.ones((self.batch_size, 1))
         fake = np.zeros((self.batch_size, 1))
 
