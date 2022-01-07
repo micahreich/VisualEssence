@@ -14,4 +14,4 @@ Below is the general project structure for CVMLP Lab's VisualEssence project. Co
 ```
 
 ## Final Paper
-To read the full paper, please visit [this link](https://github.com/micahreich/VisualEssence/blob/master/ve_paper-2.pdf).
+To read the full paper, please visit [this link](https://github.com/micahreich/VisualEssence/blob/master/ve_paper_fnl.pdf).
